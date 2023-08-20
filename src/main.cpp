@@ -60,7 +60,7 @@ bool loadMedia()
 	bool success = true;
 
 	//Load splash image
-	gHelloWorld = SDL_LoadBMP( "hello_world.bmp" );
+	gHelloWorld = SDL_LoadBMP( "res/hello_world.bmp" );
 	if( gHelloWorld == NULL )
 	{
 		printf( "Unable to load image %s! SDL Error: %s\n", "hello_world.bmp", SDL_GetError() );
@@ -84,8 +84,10 @@ void close()
 	SDL_Quit();
 }
 
-int main( int argc, char* args[] )
+int main( int argc, char* argv[] )
 {
+
+	printf("Program started");
 	//Start up SDL and create window
 	if( !init() )
 	{
@@ -100,18 +102,6 @@ int main( int argc, char* args[] )
 		}
 		else
 		{
-            // SDL_version linked;
-            // SDL_GetVersion(&linked);
-            // SDL_version compiled;
-            // SDL_VERSION(&compiled);
-            // printf("Compiled with v.%S, linking with v. %s\n", SDL_VERSIONNUM(compiled.major, compiled.minor, compiled.patch)
-            //         , SDL_VERSIONNUM(linked.major, linked.minor, linked.patch));
-
-            if(SDL_Init(SDL_INIT_VIDEO) == -1)
-            {
-                printf("SDL failed to init: %s\n", SDL_GetError());
-                exit(1);
-            }
 
 			//Apply the image
 			SDL_BlitSurface( gHelloWorld, NULL, gScreenSurface, NULL );

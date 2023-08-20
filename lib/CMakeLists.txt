@@ -1,5 +1,7 @@
+# lib/CMakeLists.txt
 set(SDL2_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/SDL2")
 set(SDL2_BUILD_DIR "${SDL2_SOURCE_DIR}/build")
+
 
 # Check if SDL2 source is present
 if(NOT EXISTS "${SDL2_SOURCE_DIR}")
@@ -25,5 +27,5 @@ if(NOT EXISTS ${SDL2_SHARED_LIB})
   )
 endif()
 
-# Include SDL2 as a subdirectory (this assumes SDL2 provides a CMakeLists.txt file)
+# Include SDL2 as a subdirectory 
 add_subdirectory(${SDL2_SOURCE_DIR} EXCLUDE_FROM_ALL)
