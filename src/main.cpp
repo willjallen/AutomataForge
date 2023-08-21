@@ -10,12 +10,12 @@
 #include "engine/ShaderManager.h"
 
 //Screen dimension constants
-const int SCREEN_WIDTH = 640;
-const int SCREEN_HEIGHT = 480;
+const int SCREEN_WIDTH = 1920;
+const int SCREEN_HEIGHT = 1080;
 
-const unsigned int TEXTURE_WIDTH = 1000;
-const unsigned int TEXTURE_HEIGHT = 1000;
-const unsigned int TEXTURE_SIZE = 1000;
+const unsigned int TEXTURE_WIDTH = 1920;
+const unsigned int TEXTURE_HEIGHT = 1080;
+// const unsigned int TEXTURE_SIZE = 1000;
 
 void renderQuad();
 
@@ -32,7 +32,7 @@ int main( int argc, char* args[] )
 
 	Shader* computeShader = shaderManager.getShader("basic_compute");
 	computeShader->use();
-	computeShader->setUniform("textureSize", (int)TEXTURE_SIZE);
+	computeShader->setUniform("textureSize", (int)TEXTURE_WIDTH);
 	Shader* screenQuad = shaderManager.getShader("screen_quad");
 	screenQuad->use();
 	screenQuad->setUniform("text", (int)0);
@@ -60,10 +60,15 @@ int main( int argc, char* args[] )
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
 	// Set the magnification filter to linear interpolation (smoothing effect when scaling up)
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	// glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 	// Set the minification filter to linear interpolation (smoothing effect when scaling down)
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	// glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+
+	// Avoid any interpolation between pixels (black and white only)
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+
 
 	// Allocate memory and specify the 2D texture image format (e.g., RGBA32F), size, and data type
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, TEXTURE_WIDTH, TEXTURE_HEIGHT, 0, GL_RGBA, GL_FLOAT, NULL);
@@ -82,7 +87,8 @@ int main( int argc, char* args[] )
 	for (int y = 0; y < TEXTURE_HEIGHT; y++) {
 		for (int x = 0; x < TEXTURE_WIDTH; x++) {
 		int index = (y * TEXTURE_WIDTH + x) * 4;
-		float value = (rand() % 100 < 10) ? 1.0f : 0.0f; // 10% chance of being alive
+		float value = (rand() % 100 < 20) ? 1.0f : 0.0f; // 10% chance of being alive
+		// float value = 1.0f;
 		initialState[index] = value; // Red channel (use this for the state)
 		initialState[index + 1] = value; // Green channel
 		initialState[index + 2] = value; // Blue channel
@@ -106,7 +112,7 @@ int main( int argc, char* args[] )
 	SDL_StartTextInput();
 
 	// Desired frame rate (set to 0 if no limit is desired)
-	const int TARGET_FPS = 0;
+	const int TARGET_FPS = 59;
 	const int TARGET_FRAME_DURATION = TARGET_FPS > 0 ? 1000 / TARGET_FPS : 0;
 
 	// Variables to keep track of the frame time and frame count
@@ -139,7 +145,7 @@ int main( int argc, char* args[] )
 		computeShader->setUniform("t", (float)SDL_GetTicks64());
 		
 		// Divide the dispatch by local workgroup size (10 in this case)
-		glDispatchCompute(TEXTURE_SIZE / 10, TEXTURE_SIZE / 10, 1);
+		glDispatchCompute(TEXTURE_WIDTH / 10, TEXTURE_HEIGHT / 10, 1);
 
 		// make sure writing to image has finished before read
 		glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
