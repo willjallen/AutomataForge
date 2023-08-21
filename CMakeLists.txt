@@ -1,3 +1,4 @@
+# /CMakeLists.txt
 cmake_minimum_required(VERSION 3.15)
 
 project(AutomataForge)
@@ -18,49 +19,39 @@ file(GLOB SOURCES "${SOURCE_DIR}/*.cpp")
 # Define the executable
 add_executable(${PROJECT_NAME} ${SOURCES})
 
-set(SDL2_INCLUDE_PATH "${LIB_DIR}/SDL2/include") # Adjust the path according to your project structure
-target_include_directories(${PROJECT_NAME} PRIVATE ${INCLUDE_DIR} ${SDL2_INCLUDE_DIRS})
+# Define includes
+target_include_directories(${PROJECT_NAME} PRIVATE ${INCLUDE_DIR} ${SDL2_INCLUDE_DIR})
+target_link_directories(${PROJECT_NAME} PRIVATE "${SDL2_BUILD_DIR}/$<CONFIG>")
 
+# message(STATUS "SDL2 Include Directory: ${SDL2_INCLUDE_DIR}")
 
 # Platform-specific logic
 if(WIN32)
   message(STATUS "Configuring for Windows")
   set_target_properties(${PROJECT_NAME} PROPERTIES LINK_FLAGS "/SUBSYSTEM:CONSOLE")
   target_link_libraries(${PROJECT_NAME} SDL2 SDL2main)
-
 else()
   target_link_libraries(${PROJECT_NAME} SDL2)
 endif()
+
+
 
 # Define the output directory
 set(OUTPUT_DIR ${CMAKE_SOURCE_DIR}/out)
 
 # Delete and recreate the output directory
-add_custom_command(OUTPUT ${OUTPUT_DIR}
-                   COMMAND ${CMAKE_COMMAND} -E remove_directory ${OUTPUT_DIR}
-                   COMMAND ${CMAKE_COMMAND} -E make_directory ${OUTPUT_DIR})
+file(REMOVE_RECURSE ${OUTPUT_DIR})
+file(MAKE_DIRECTORY ${OUTPUT_DIR})
 
-if(CMAKE_BUILD_TYPE MATCHES Debug)
-  add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-                     COMMAND ${CMAKE_COMMAND} -E copy_directory
-                     ${CMAKE_BINARY_DIR}/Debug
-                     ${OUTPUT_DIR})
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+                    COMMAND ${CMAKE_COMMAND} -E copy_directory
+                    ${SDL2_BUILD_DIR}/$<CONFIG> # Copy SDL2 files based on the current configuration
+                    ${OUTPUT_DIR})
 
-  add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-                     COMMAND ${CMAKE_COMMAND} -E copy_directory
-                     ${CMAKE_BINARY_DIR}/lib/SDL2/debug
-                     ${OUTPUT_DIR})
-else() # Assuming Release mode
-  add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-                     COMMAND ${CMAKE_COMMAND} -E copy_directory
-                     ${CMAKE_BINARY_DIR}/Release
-                     ${OUTPUT_DIR})
-
-  add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-                     COMMAND ${CMAKE_COMMAND} -E copy_directory
-                     ${CMAKE_BINARY_DIR}/lib/SDL2/release
-                     ${OUTPUT_DIR})
-endif()
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+                    COMMAND ${CMAKE_COMMAND} -E copy_directory
+                    ${CMAKE_BINARY_DIR}/$<CONFIG>
+                    ${OUTPUT_DIR})
 
 # Copy resources from the res/ folder
 file(COPY ${CMAKE_SOURCE_DIR}/res/ DESTINATION ${OUTPUT_DIR}/res)
