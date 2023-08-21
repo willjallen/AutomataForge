@@ -4,5 +4,11 @@ Die of old age
 Sources for new cells (5x5 grid of randomly spawning cells)
 
 Colored cells for extra dimensions
+(color of cell corresponds with heat storage, cells release heat and
+fall into different colors per tick until death. Rewrite rules depend on color configuration of neighbors)
 
 Add GLEW in a platform agnostic way
+
+Bit mask in shaders
+
+Custom one-time compute workgroup/layout size optimization program

@@ -112,7 +112,7 @@ int main( int argc, char* args[] )
 	SDL_StartTextInput();
 
 	// Desired frame rate (set to 0 if no limit is desired)
-	const int TARGET_FPS = 59;
+	const int TARGET_FPS = 0;
 	const int TARGET_FRAME_DURATION = TARGET_FPS > 0 ? 1000 / TARGET_FPS : 0;
 
 	// Variables to keep track of the frame time and frame count
@@ -258,3 +258,4 @@ void renderQuad()
     // glEnableVertexAttribArray(0);
 
 	// glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+
