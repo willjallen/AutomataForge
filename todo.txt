@@ -4,3 +4,5 @@ Die of old age
 Sources for new cells (5x5 grid of randomly spawning cells)
 
 Colored cells for extra dimensions
+
+Add GLEW in a platform agnostic way
