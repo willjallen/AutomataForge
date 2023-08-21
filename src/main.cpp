@@ -15,6 +15,7 @@ const int SCREEN_HEIGHT = 480;
 
 const unsigned int TEXTURE_WIDTH = 1000;
 const unsigned int TEXTURE_HEIGHT = 1000;
+const unsigned int TEXTURE_SIZE = 1000;
 
 void renderQuad();
 
@@ -27,9 +28,11 @@ int main( int argc, char* args[] )
 	// Load shader manager
 	ShaderManager shaderManager;
 	shaderManager.loadShader("screen_quad", "shaders/screen_quad_vertex.glsl", "shaders/screen_quad_fragment.glsl");
-	shaderManager.loadShader("basic_compute", "shaders/basic_compute.glsl");
+	shaderManager.loadShader("basic_compute", "shaders/game_of_life_compute.glsl");
 
 	Shader* computeShader = shaderManager.getShader("basic_compute");
+	computeShader->use();
+	computeShader->setUniform("textureSize", (int)TEXTURE_SIZE);
 	Shader* screenQuad = shaderManager.getShader("screen_quad");
 	screenQuad->use();
 	screenQuad->setUniform("text", (int)0);
@@ -72,6 +75,30 @@ int main( int argc, char* args[] )
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, texture);
 
+	// Create a buffer for the initial state
+	float* initialState = new float[TEXTURE_WIDTH * TEXTURE_HEIGHT * 4];
+
+	// Populate the buffer with the initial state
+	for (int y = 0; y < TEXTURE_HEIGHT; y++) {
+		for (int x = 0; x < TEXTURE_WIDTH; x++) {
+		int index = (y * TEXTURE_WIDTH + x) * 4;
+		float value = (rand() % 100 < 10) ? 1.0f : 0.0f; // 10% chance of being alive
+		initialState[index] = value; // Red channel (use this for the state)
+		initialState[index + 1] = value; // Green channel
+		initialState[index + 2] = value; // Blue channel
+		initialState[index + 3] = 1.0f; // Alpha channel (always 1)
+		}
+	}
+
+	// Bind the texture object to the 2D texture target
+	glBindTexture(GL_TEXTURE_2D, texture);
+
+	// Upload the buffer to the texture
+	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, TEXTURE_WIDTH, TEXTURE_HEIGHT, GL_RGBA, GL_FLOAT, initialState);
+
+	// Clean up the buffer
+	delete[] initialState;
+
 
 	bool running = true;
 	
@@ -79,7 +106,7 @@ int main( int argc, char* args[] )
 	SDL_StartTextInput();
 
 	// Desired frame rate (set to 0 if no limit is desired)
-	const int TARGET_FPS = 10;
+	const int TARGET_FPS = 0;
 	const int TARGET_FRAME_DURATION = TARGET_FPS > 0 ? 1000 / TARGET_FPS : 0;
 
 	// Variables to keep track of the frame time and frame count
@@ -110,7 +137,9 @@ int main( int argc, char* args[] )
 
 		computeShader->use();
 		computeShader->setUniform("t", (float)SDL_GetTicks64());
-		glDispatchCompute((unsigned int)TEXTURE_WIDTH/10, (unsigned int)TEXTURE_HEIGHT/10, 1);
+		
+		// Divide the dispatch by local workgroup size (10 in this case)
+		glDispatchCompute(TEXTURE_SIZE / 10, TEXTURE_SIZE / 10, 1);
 
 		// make sure writing to image has finished before read
 		glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);

@@ -60,12 +60,14 @@ void Window::initialize(const std::string &title, int width, int height) {
         return;
     }
 
+    // Don't use V-sync
+    SDL_GL_SetSwapInterval(0); // Disable V-Sync
 
     //Use Vsync
-    if( SDL_GL_SetSwapInterval(1) < 0) {
-        printf( "Warning: Unable to set VSync, SDL Error: %s\n", SDL_GetError() );
-        return;
-    }
+    // if( SDL_GL_SetSwapInterval(1) < 0) {
+    //     printf( "Warning: Unable to set VSync, SDL Error: %s\n", SDL_GetError() );
+    //     return;
+    // }
 
 
 }
