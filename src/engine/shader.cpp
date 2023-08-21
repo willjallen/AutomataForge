@@ -1,69 +1,80 @@
-#include "engine/shader.h"
 #include <iostream>
 #include <fstream>
 #include <sstream>
 
+#include "engine/Shader.h"
+
+Shader::Shader(){}
+
 Shader::Shader(const std::string &vertexPath, const std::string &fragmentPath) {
-    GLuint vertexShader = LoadShader(vertexPath, GL_VERTEX_SHADER);
-    GLuint fragmentShader = LoadShader(fragmentPath, GL_FRAGMENT_SHADER);
+    this->vertexPath = vertexPath;
+    this->fragmentPath = fragmentPath;
+    
+    GLuint vertexShader = loadShader(vertexPath, GL_VERTEX_SHADER);
+    GLuint fragmentShader = loadShader(fragmentPath, GL_FRAGMENT_SHADER);
 
-    programID = glCreateProgram();
-    glAttachShader(programID, vertexShader);
-    glAttachShader(programID, fragmentShader);
-    glLinkProgram(programID);
+    this->programID = glCreateProgram();
+    glAttachShader(this->programID, vertexShader);
+    glAttachShader(this->programID, fragmentShader);
+    glLinkProgram(this->programID);
 
-    CheckCompileErrors(programID, "PROGRAM");
+    checkCompileErrors(this->programID, "PROGRAM");
+
 
     glDeleteShader(vertexShader);
     glDeleteShader(fragmentShader);
 }
 
 Shader::~Shader() {
-    glDeleteProgram(programID);
+    glDeleteProgram(this->programID);
 }
 
-void Shader::Use() {
-    glUseProgram(programID);
+void Shader::use() {
+
+    printf("%d\n", glGetError());
+    glUseProgram(this->programID);
+    printf("%d\n", glGetError());
 }
 
-void Shader::SetUniform(const std::string &name, float value) {
-    glUniform1f(glGetUniformLocation(programID, name.c_str()), value);
+void Shader::setUniform(const std::string &name, float value) {
+    glUniform1f(glGetUniformLocation(this->programID, name.c_str()), value);
 }
 
-void Shader::SetUniform(const std::string &name, int value) {
-    glUniform1i(glGetUniformLocation(programID, name.c_str()), value);
+void Shader::setUniform(const std::string &name, int value) {
+    glUniform1i(glGetUniformLocation(this->programID, name.c_str()), value);
 }
 
-GLuint Shader::LoadShader(const std::string &path, GLenum shaderType) {
+GLuint Shader::loadShader(const std::string &path, GLenum shaderType) {
     std::ifstream file(path);
     std::stringstream buffer;
     buffer << file.rdbuf();
     std::string shaderCode = buffer.str();
+    printf("Shader code: %s", shaderCode.c_str());
 
     GLuint shaderID = glCreateShader(shaderType);
-    const char *codePtr = shaderCode.c_str();
-    glShaderSource(shaderID, 1, &codePtr, nullptr);
+    const GLchar *source = (const GLchar *)shaderCode.c_str();
+    glShaderSource(shaderID, 1, &source, 0);
     glCompileShader(shaderID);
 
-    CheckCompileErrors(shaderID, shaderType == GL_VERTEX_SHADER ? "VERTEX" : "FRAGMENT");
+    checkCompileErrors(shaderID, shaderType == GL_VERTEX_SHADER ? "VERTEX" : "FRAGMENT");
 
     return shaderID;
 }
 
-void Shader::CheckCompileErrors(GLuint shader, const std::string &type) {
+void Shader::checkCompileErrors(GLuint shader, const std::string &type) {
     GLint success;
     GLchar infoLog[1024];
     if (type != "PROGRAM") {
         glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
         if (!success) {
             glGetShaderInfoLog(shader, 1024, nullptr, infoLog);
-            std::cerr << "ERROR::SHADER_COMPILATION_ERROR of type: " << type << "\n" << infoLog << "\n";
+            printf("ERROR::SHADER_COMPILATION_ERROR of type: %s\n%s\nVertex Path: %s\nFragment Path: %s\n", type.c_str(), infoLog, vertexPath.c_str(), fragmentPath.c_str());
         }
     } else {
         glGetProgramiv(shader, GL_LINK_STATUS, &success);
         if (!success) {
             glGetProgramInfoLog(shader, 1024, nullptr, infoLog);
-            std::cerr << "ERROR::PROGRAM_LINKING_ERROR of type: " << type << "\n" << infoLog << "\n";
+            printf("ERROR::PROGRAM_LINKING_ERROR of type: %s\n%s\nVertex Path: %s\nFragment Path: %s\n", type.c_str(), infoLog, vertexPath.c_str(), fragmentPath.c_str());
         }
     }
 }

@@ -5,7 +5,7 @@
 #include <stdio.h>
 
 
-#include "engine/window.h"
+#include "engine/Window.h"
 
 Window::Window(const std::string &title, int width, int height) {
     initialize(title, width, height);

@@ -72,6 +72,9 @@ add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
                     COMMAND ${CMAKE_COMMAND} -E copy_directory
                     ${GLEW_BIN_DIR} 
                     ${OUTPUT_DIR})
+
 # Copy resources from the res/ folder
 file(COPY ${CMAKE_SOURCE_DIR}/res/ DESTINATION ${OUTPUT_DIR}/res)
+# Copy shaders from the shaders/ folder
+file(COPY ${CMAKE_SOURCE_DIR}/shaders/ DESTINATION ${OUTPUT_DIR}/shaders)
 

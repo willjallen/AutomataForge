@@ -1,6 +1,6 @@
 #pragma once
 #include <vector>
-#include "layer.h"
+#include "Layer.h"
 // #include "cuda_runtime.h"
 
 // __global__ void update();
