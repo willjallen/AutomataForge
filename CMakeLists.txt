@@ -35,6 +35,7 @@ if(WIN32)
   set_target_properties(${PROJECT_NAME} PROPERTIES LINK_FLAGS "/SUBSYSTEM:CONSOLE")
   target_link_libraries(${PROJECT_NAME} SDL2 SDL2main)
   target_link_libraries(${PROJECT_NAME} ${GLEW_LIBRARY})
+  target_link_libraries(${PROJECT_NAME} opengl32)
 else()
   target_link_libraries(${PROJECT_NAME} SDL2)
 endif()
@@ -56,16 +57,20 @@ add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
 # Copy SDL2 libraries
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
                     COMMAND ${CMAKE_COMMAND} -E copy_directory
-                    ${SDL2_BUILD_DIR}/$<CONFIG> # Copy SDL2 files based on the current configuration
+                    ${SDL2_BUILD_DIR}/$<CONFIG> 
                     ${OUTPUT_DIR})
 
 
 # Copy GLEW libraries
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
                     COMMAND ${CMAKE_COMMAND} -E copy_directory
-                    ${GLEW_LIB_DIR} # Copy SDL2 files based on the current configuration
+                    ${GLEW_LIB_DIR} 
                     ${OUTPUT_DIR})
-
+# Copy GLEW binaries
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+                    COMMAND ${CMAKE_COMMAND} -E copy_directory
+                    ${GLEW_BIN_DIR} 
+                    ${OUTPUT_DIR})
 # Copy resources from the res/ folder
 file(COPY ${CMAKE_SOURCE_DIR}/res/ DESTINATION ${OUTPUT_DIR}/res)
 

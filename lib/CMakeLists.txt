@@ -34,6 +34,7 @@ endif()
 set(GLEW_DIR "${CMAKE_SOURCE_DIR}/lib/glew")
 set(GLEW_INCLUDE_DIR "${GLEW_DIR}/include")
 set(GLEW_LIB_DIR "${GLEW_DIR}/lib/Release/x64")
+set(GLEW_BIN_DIR "${GLEW_DIR}/bin/Release/x64")
 
 # TODO: Adjust this line based on platform
 set(GLEW_LIBRARY "${GLEW_LIB_DIR}/glew32.lib")
@@ -41,4 +42,5 @@ set(GLEW_LIBRARY "${GLEW_LIB_DIR}/glew32.lib")
 # Export the include directory and lib
 set(GLEW_INCLUDE_DIR ${GLEW_INCLUDE_DIR} PARENT_SCOPE)
 set(GLEW_LIB_DIR ${GLEW_LIB_DIR} PARENT_SCOPE)
+set(GLEW_BIN_DIR ${GLEW_BIN_DIR} PARENT_SCOPE)
 set(GLEW_LIBRARY ${GLEW_LIBRARY} PARENT_SCOPE)
