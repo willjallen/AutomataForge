@@ -14,7 +14,8 @@ set(LIB_DIR ${CMAKE_SOURCE_DIR}/lib)
 add_subdirectory(${LIB_DIR})
 
 # Define the source files
-file(GLOB SOURCES "${SOURCE_DIR}/*.cpp")
+file(GLOB_RECURSE SOURCES "${SOURCE_DIR}/*.cpp")
+
 
 # Define the executable
 add_executable(${PROJECT_NAME} ${SOURCES})
