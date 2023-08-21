@@ -6,6 +6,22 @@
 
 Shader::Shader(){}
 
+Shader::Shader(const std::string &computePath){
+    this->computePath = computePath;
+
+    GLuint computeShader = loadShader(computePath, GL_COMPUTE_SHADER);
+
+    this->programID = glCreateProgram();
+
+    glAttachShader(this->programID, computeShader);
+    glLinkProgram(this->programID);
+
+    checkCompileErrors(this->programID, "PROGRAM");
+
+    glDeleteShader(computeShader);
+
+}
+
 Shader::Shader(const std::string &vertexPath, const std::string &fragmentPath) {
     this->vertexPath = vertexPath;
     this->fragmentPath = fragmentPath;
@@ -30,10 +46,7 @@ Shader::~Shader() {
 }
 
 void Shader::use() {
-
-    printf("%d\n", glGetError());
     glUseProgram(this->programID);
-    printf("%d\n", glGetError());
 }
 
 void Shader::setUniform(const std::string &name, float value) {
@@ -56,7 +69,17 @@ GLuint Shader::loadShader(const std::string &path, GLenum shaderType) {
     glShaderSource(shaderID, 1, &source, 0);
     glCompileShader(shaderID);
 
-    checkCompileErrors(shaderID, shaderType == GL_VERTEX_SHADER ? "VERTEX" : "FRAGMENT");
+    switch(shaderType){
+        case GL_VERTEX_SHADER:
+            checkCompileErrors(shaderID, "VERTEX");
+            break;
+        case GL_FRAGMENT_SHADER:
+            checkCompileErrors(shaderID, "FRAGMENT");
+            break;
+        case GL_COMPUTE_SHADER:
+            checkCompileErrors(shaderID, "COMPUTE");
+            break;
+    }
 
     return shaderID;
 }

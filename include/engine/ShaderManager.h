@@ -8,7 +8,11 @@
 class ShaderManager {
 public:
 
-    ShaderManager() {};
+    /**
+     * @brief Construct a new Shader Manager object. Performs checks of GL capabilities for compute shaders.
+     * 
+     */
+    ShaderManager();
 
     /**
      * @brief Frees all shaders stored in shaders map
@@ -25,6 +29,14 @@ public:
      */
     bool loadShader(const std::string &name, const std::string &vertexPath, const std::string &fragmentPath);
 
+    /**
+     * @brief Loads and stores a shader program.
+     * @param name Name or identifier for the shader program.
+     * @param computePath Path to the compute shader file.
+     * @return True if the shader was loaded successfully, false otherwise.
+     */
+    bool loadShader(const std::string &name, const std::string &computePath);
+    
     /**
      * @brief Retrieves a shader program by name.
      * @param name Name or identifier for the shader program.

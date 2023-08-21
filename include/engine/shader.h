@@ -13,6 +13,12 @@ public:
     Shader();
 
     /**
+     * @brief Constructs the Shader object and compiles compute shader.
+     * @param computePath Path to the compute shader file.
+     */
+    Shader(const std::string &computePath);
+
+    /**
      * @brief Constructs the Shader object and compiles the vertex and fragment shaders.
      * @param vertexPath Path to the vertex shader file.
      * @param fragmentPath Path to the fragment shader file.
@@ -47,6 +53,7 @@ private:
     GLuint programID;
     std::string vertexPath;
     std::string fragmentPath;
+    std::string computePath;
 
     /**
      * @brief Loads and compiles a shader from a file.
