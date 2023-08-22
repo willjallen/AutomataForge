@@ -1,3 +1,4 @@
+#include <stdexcept>
 #include "engine/ShaderManager.h"
 
 ShaderManager::ShaderManager(){
@@ -34,16 +35,22 @@ ShaderManager::~ShaderManager() {
 }
 
 bool ShaderManager::loadShader(const std::string &name, const std::string &vertexPath, const std::string &fragmentPath) {
+    if (shaders.find(name) != shaders.end()) {
+        throw std::runtime_error("Shader " + name + " already exists.");
+    }
     Shader* shader = new Shader(vertexPath, fragmentPath);
     this->shaders[name] = shader;
-    return true; //TODO: Error checking
+    return true; // TODO: Error checking
 }
 
 
-bool ShaderManager::loadShader(const std::string &name, const std::string &computePath) {
+bool ShaderManager::loadComputeShader(const std::string &name, const std::string &computePath) {
+    if (shaders.find(name) != shaders.end()) {
+        throw std::runtime_error("Compute shader " + name + " already exists.");
+    }
     Shader* shader = new Shader(computePath);
     this->shaders[name] = shader;
-    return true; //TODO: Error checking
+    return true; // TODO: Error checking
 }
 
 Shader* ShaderManager::getShader(const std::string &name) {
@@ -51,5 +58,28 @@ Shader* ShaderManager::getShader(const std::string &name) {
     if (it != this->shaders.end()) {
         return (it->second);
     }
-    return nullptr;
+    throw std::runtime_error("Attempted to get shader " + name + " but shader was not found.");
+}
+
+template <typename T>
+bool ShaderManager::setUniform(const std::string& shaderName, const std::string& uniformName, T value) {
+    Shader* shader = getShader(shaderName); // Exception will be thrown if shader does not exist
+
+    GLint location = glGetUniformLocation(shader->getProgramID(), uniformName.c_str());
+    if (location == -1) {
+        throw std::runtime_error("Invalid uniform location '" + uniformName + "' in shader '" + shaderName + "'.");
+    }
+
+    // TODO: You might want to add checks for valid GL values specific to the type T here
+
+    // Use appropriate method in Shader class based on the type T
+    shader->setUniform(uniformName, value);
+
+    // Check for OpenGL errors
+    GLenum error = glGetError();
+    if (error != GL_NO_ERROR) {
+        throw std::runtime_error("OpenGL error setting uniform '" + uniformName + "' in shader '" + shaderName + "'.");
+    }
+
+    return true;
 }
