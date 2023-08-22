@@ -40,14 +40,14 @@ public:
      * @param name Name of the uniform variable.
      * @param value Value to be set.
      */
-    void setUniform(const std::string &name, float value);
+    void setUniformFloat(const std::string &name, float value);
 
     /**
      * @brief Sets an integer uniform variable in the shader.
      * @param name Name of the uniform variable.
      * @param value Value to be set.
      */
-    void setUniform(const std::string &name, int value);
+    void setUniformInt(const std::string &name, int value);
 
 private:
     GLuint programID;

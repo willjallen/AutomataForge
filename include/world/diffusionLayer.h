@@ -1,15 +1,22 @@
 #pragma once
 #include <vector>
 #include "Layer.h"
-// #include "cuda_runtime.h"
 
-// __global__ void update();
-
-class DiffusionLayer : public Layer<float>{
+class DiffusionLayer : public Layer{
     public: 
-        DiffusionLayer(float diffusion_rate) 
-            : diffusion_rate(diffusion_rate) {};
+        /**
+         * @brief Construct a new Diffusion Layer object.
+         * TODO: Different diffusion methods
+         * 
+         * @param diffusionRate 
+         */
+        DiffusionLayer(float diffusionRate);
+        ~DiffusionLayer();
+
+        void reset();
+        void update();
+        void render();
     private:
-        float diffusion_rate;
+        float diffusionRate;
 
 };

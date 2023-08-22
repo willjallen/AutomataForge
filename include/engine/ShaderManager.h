@@ -44,12 +44,6 @@ public:
      */
     Shader* getShader(const std::string &name);
 
-    /**
-     * @brief Sets the specified shader as the active shader for rendering.
-     * @param name Name or identifier for the shader program.
-     */
-    void useShader(const std::string &name);
-
 private:
     std::unordered_map<std::string, Shader*> shaders;
 };

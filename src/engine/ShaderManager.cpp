@@ -21,6 +21,10 @@ ShaderManager::ShaderManager(){
     printf("maximum size of a work group in Z dimension %d\n", max_compute_work_group_size[2]);
 
     printf("Number of invocations in a single local work group that may be dispatched to a compute shader %d\n", max_compute_work_group_invocations);
+
+    GLint maxTextureUnits;
+    glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, &maxTextureUnits);
+    printf("Max number of texture units: %d", maxTextureUnits);
 }
 
 ShaderManager::~ShaderManager() {
@@ -48,11 +52,4 @@ Shader* ShaderManager::getShader(const std::string &name) {
         return (it->second);
     }
     return nullptr;
-}
-
-void ShaderManager::useShader(const std::string &name) {
-    Shader* shader = getShader(name);
-    if (shader) {
-        shader->use();
-    }
 }

@@ -7,9 +7,8 @@
 
 #include "engine/Window.h"
 
-Window::Window(const std::string &title, int width, int height) {
-    initialize(title, width, height);
-    initializeGL();
+Window::Window(const std::string &name, unsigned int width, unsigned int height) {
+    this->initialize(name, width, height);
 }
 
 Window::~Window() {
@@ -30,7 +29,7 @@ void Window::swapBuffers() {
     SDL_GL_SwapWindow(window);
 }
 
-void Window::initialize(const std::string &title, int width, int height) {
+void Window::initialize(const std::string &title, unsigned int width, unsigned int height) {
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
         printf("Failed to init SDL: %s\n", SDL_GetError());
         return;
@@ -78,8 +77,6 @@ void Window::initializeGL(){
 }
 
 void Window::cleanUp() {
-	//Deallocate program
-	// glDeleteProgram( gProgramID );
 
 	//Destroy window	
 	SDL_DestroyWindow(this->window);

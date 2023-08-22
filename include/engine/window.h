@@ -11,7 +11,7 @@ public:
      * @param width The width of the window.
      * @param height The height of the window.
      */
-    Window(const std::string &title, int width, int height);
+    Window(const std::string &name, unsigned int width, unsigned int height);
 
     /**
      * @brief Destroys the Window object and cleans up the SDL window and OpenGL context.
@@ -42,7 +42,7 @@ private:
     /**
      * @brief Initializes SDL and creates the window with an OpenGL context.
      */
-    void initialize(const std::string &title, int width, int height);
+    void initialize(const std::string &title, unsigned int width, unsigned int height);
 
     /**
      * @brief Initializes GL and loads shaders
