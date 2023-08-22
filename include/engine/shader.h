@@ -2,6 +2,7 @@
 
 #include <string>
 #include <GL/glew.h>
+#include <glm/glm.hpp> 
 
 class Shader {
 public:
@@ -36,18 +37,78 @@ public:
     void use();
 
     /**
-     * @brief Sets a float uniform variable in the shader.
+     * @brief General templated method for setting uniform values (catch-all for unsupported types).
      * @param name Name of the uniform variable.
-     * @param value Value to be set.
+     * @param value Value to set.
+     * @throw std::runtime_error Throws an error if the type is not supported.
      */
-    void setUniformFloat(const std::string &name, float value);
+    template <typename T>
+    void setUniform(const std::string &name, T value);
 
     /**
-     * @brief Sets an integer uniform variable in the shader.
+     * @brief Sets a float uniform value in the shader program.
      * @param name Name of the uniform variable.
-     * @param value Value to be set.
+     * @param value Float value to set.
      */
-    void setUniformInt(const std::string &name, int value);
+    template <>
+    void setUniform<float>(const std::string &name, float value);
+
+    /**
+     * @brief Sets an int uniform value in the shader program.
+     * @param name Name of the uniform variable.
+     * @param value Int value to set.
+     */
+    template <>
+    void setUniform<int>(const std::string &name, int value);
+
+    /**
+     * @brief Sets a glm::vec2 uniform value in the shader program.
+     * @param name Name of the uniform variable.
+     * @param value glm::vec2 value to set.
+     */
+    template <>
+    void setUniform<glm::vec2>(const std::string &name, glm::vec2 value);
+
+    /**
+     * @brief Sets a glm::vec3 uniform value in the shader program.
+     * @param name Name of the uniform variable.
+     * @param value glm::vec3 value to set.
+     */
+    template <>
+    void setUniform<glm::vec3>(const std::string &name, glm::vec3 value);
+
+    /**
+     * @brief Sets a glm::vec4 uniform value in the shader program.
+     * @param name Name of the uniform variable.
+     * @param value glm::vec4 value to set.
+     */
+    template <>
+    void setUniform<glm::vec4>(const std::string &name, glm::vec4 value);
+
+    /**
+     * @brief Sets a glm::mat2 uniform value in the shader program.
+     * @param name Name of the uniform variable.
+     * @param value glm::mat2 value to set.
+     */
+    template <>
+    void setUniform<glm::mat2>(const std::string &name, glm::mat2 value);
+
+    /**
+     * @brief Sets a glm::mat3 uniform value in the shader program.
+     * @param name Name of the uniform variable.
+     * @param value glm::mat3 value to set.
+     */
+    template <>
+    void setUniform<glm::mat3>(const std::string &name, glm::mat3 value);
+
+    /**
+     * @brief Sets a glm::mat4 uniform value in the shader program.
+     * @param name Name of the uniform variable.
+     * @param value glm::mat4 value to set.
+     */
+    template <>
+    void setUniform<glm::mat4>(const std::string &name, glm::mat4 value);
+
 
 private:
     GLuint programID;

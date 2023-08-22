@@ -49,12 +49,58 @@ void Shader::use() {
     glUseProgram(this->programID);
 }
 
-void Shader::setUniformFloat(const std::string &name, float value) {
-    glUniform1f(glGetUniformLocation(this->programID, name.c_str()), value);
+// General templated method (catch-all for unsupported types)
+template <typename T>
+void Shader::setUniform(const std::string &name, T value) {
+    throw std::runtime_error("Uniform type not supported.");
 }
 
-void Shader::setUniformInt(const std::string &name, int value) {
-    glUniform1i(glGetUniformLocation(this->programID, name.c_str()), value);
+// Specialization for float
+template <>
+void Shader::setUniform<float>(const std::string &name, float value) {
+    glUniform1f(getUniformLocation(name), value);
+}
+
+// Specialization for int
+template <>
+void Shader::setUniform<int>(const std::string &name, int value) {
+    glUniform1i(getUniformLocation(name), value);
+}
+
+// Specialization for glm::vec2
+template <>
+void Shader::setUniform<glm::vec2>(const std::string &name, glm::vec2 value) {
+    glUniform2fv(getUniformLocation(name), 1, glm::value_ptr(value));
+}
+
+// Specialization for glm::vec3
+template <>
+void Shader::setUniform<glm::vec3>(const std::string &name, glm::vec3 value) {
+    glUniform3fv(getUniformLocation(name), 1, glm::value_ptr(value));
+}
+
+// Specialization for glm::vec4
+template <>
+void Shader::setUniform<glm::vec4>(const std::string &name, glm::vec4 value) {
+    glUniform4fv(getUniformLocation(name), 1, glm::value_ptr(value));
+}
+
+// Specialization for glm::mat2
+template <>
+void Shader::setUniform<glm::mat2>(const std::string &name, glm::mat2 value) {
+    glUniformMatrix2fv(getUniformLocation(name), 1, GL_FALSE, glm::value_ptr(value));
+}
+
+// Specialization for glm::mat3
+template <>
+void Shader::setUniform<glm::mat3>(const std::string &name, glm::mat3 value) {
+    glUniformMatrix3fv(getUniformLocation(name), 1, GL_FALSE, glm::value_ptr(value));
+}
+
+// Specialization for glm::mat4
+template <>
+void Shader::setUniform<glm::mat4>(const std::string &name, glm::mat4 value) {
+    glUniformMatrix4fv(getUniformLocation(name), 1, GL_FALSE, glm::value_ptr(value));
 }
 
 GLuint Shader::loadShader(const std::string &path, GLenum shaderType) {
