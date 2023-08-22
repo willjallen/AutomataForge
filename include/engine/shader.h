@@ -36,6 +36,36 @@ public:
      */
     void use();
 
+
+private:
+    GLuint programID;
+    std::string vertexPath;
+    std::string fragmentPath;
+    std::string computePath;
+
+    /**
+     * @brief Loads and compiles a shader from a file.
+     * @param path Path to the shader file.
+     * @param shaderType Type of the shader (e.g., GL_VERTEX_SHADER).
+     * @return The shader ID.
+     */
+    GLuint loadShader(const std::string &path, GLenum shaderType);
+
+    /**
+     * @brief Checks for compilation or linking errors.
+     * @param shader ID of the shader or program.
+     * @param type Type of the error to check ("VERTEX", "FRAGMENT", or "PROGRAM").
+     */
+    void checkCompileErrors(GLuint shader, const std::string &type);
+
+    /**
+     * @brief Retrieves the location of a uniform variable within the shader program.
+     * @param name The name of the uniform variable.
+     * @return The location of the uniform variable, or -1 if the uniform variable does not exist.
+     * @throws std::runtime_error if the uniform variable is not found.
+     */
+    GLint getUniformLocation(const std::string &uniformName) const;
+
     /**
      * @brief General templated method for setting uniform values (catch-all for unsupported types).
      * @param name Name of the uniform variable.
@@ -108,26 +138,4 @@ public:
      */
     template <>
     void setUniform<glm::mat4>(const std::string &name, glm::mat4 value);
-
-
-private:
-    GLuint programID;
-    std::string vertexPath;
-    std::string fragmentPath;
-    std::string computePath;
-
-    /**
-     * @brief Loads and compiles a shader from a file.
-     * @param path Path to the shader file.
-     * @param shaderType Type of the shader (e.g., GL_VERTEX_SHADER).
-     * @return The shader ID.
-     */
-    GLuint loadShader(const std::string &path, GLenum shaderType);
-
-    /**
-     * @brief Checks for compilation or linking errors.
-     * @param shader ID of the shader or program.
-     * @param type Type of the error to check ("VERTEX", "FRAGMENT", or "PROGRAM").
-     */
-    void checkCompileErrors(GLuint shader, const std::string &type);
 };

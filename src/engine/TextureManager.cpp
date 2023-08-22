@@ -18,6 +18,7 @@ TextureManager::~TextureManager() {
         try {
             unloadTexture(pair.first);
         } catch (const std::exception& e) {
+            printf(e.what());
            // TODO: Handle exception 
         }
     }
@@ -90,7 +91,7 @@ GLuint TextureManager::getNextAvailableTextureUnit() {
     }
 
     // Find the smallest available texture unit
-    for (GLuint i = 0; i < this->maxTextureImageUnits; ++i) {
+    for (GLint i = 0; i < this->maxTextureImageUnits; ++i) {
         if (usedTextureUnits.find(i) == usedTextureUnits.end()) {
             return i; // Return the first unused texture unit
         }
@@ -109,7 +110,7 @@ GLuint TextureManager::getNextAvailableImageUnit() {
     }
 
     // Find the smallest available image unit
-    for (GLuint i = 0; i < this->maxImageUnits; ++i) {
+    for (GLint i = 0; i < this->maxImageUnits; ++i) {
         if (usedImageUnits.find(i) == usedImageUnits.end()) {
             return i; // Return the first unused image unit
         }

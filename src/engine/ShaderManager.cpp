@@ -64,13 +64,9 @@ Shader* ShaderManager::getShader(const std::string &name) {
 template <typename T>
 bool ShaderManager::setUniform(const std::string& shaderName, const std::string& uniformName, T value) {
     Shader* shader = getShader(shaderName); // Exception will be thrown if shader does not exist
-
-    GLint location = glGetUniformLocation(shader->getProgramID(), uniformName.c_str());
-    if (location == -1) {
-        throw std::runtime_error("Invalid uniform location '" + uniformName + "' in shader '" + shaderName + "'.");
-    }
-
-    // TODO: You might want to add checks for valid GL values specific to the type T here
+    
+    // Activate the shader
+    shader->use();
 
     // Use appropriate method in Shader class based on the type T
     shader->setUniform(uniformName, value);

@@ -12,3 +12,5 @@ Add GLEW in a platform agnostic way
 Bit mask in shaders
 
 Custom one-time compute workgroup/layout size optimization program
+
+Shader optimizer (run through configurations of work groups and find the best one)
