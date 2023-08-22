@@ -44,3 +44,19 @@ set(GLEW_INCLUDE_DIR ${GLEW_INCLUDE_DIR} PARENT_SCOPE)
 set(GLEW_LIB_DIR ${GLEW_LIB_DIR} PARENT_SCOPE)
 set(GLEW_BIN_DIR ${GLEW_BIN_DIR} PARENT_SCOPE)
 set(GLEW_LIBRARY ${GLEW_LIBRARY} PARENT_SCOPE)
+
+##############################################
+#                    GLM                     #
+##############################################
+set(GLM_SOURCE_DIR "${CMAKE_SOURCE_DIR}/lib/GLM")
+set(GLM_INCLUDE_DIR "${SDL2_SOURCE_DIR}/include" PARENT_SCOPE)
+
+if(NOT EXISTS "${GLM_SOURCE_DIR}")
+  FetchContent_Declare(GLM
+    GIT_REPOSITORY https://github.com/g-truc/glm
+    GIT_TAG 0.9.9.8
+    SOURCE_DIR ${GLM_SOURCE_DIR}
+  )
+  FetchContent_MakeAvailable(GLM)
+endif()
+set(glm_DIR ${CMAKE_SOURCE_DIR}/lib/GLM/cmake/glm PARENT_SCOPE) 

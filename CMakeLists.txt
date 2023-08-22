@@ -25,6 +25,9 @@ add_executable(${PROJECT_NAME} ${SOURCES})
 target_include_directories(${PROJECT_NAME} PRIVATE ${INCLUDE_DIR} ${SDL2_INCLUDE_DIR})
 # GLEW
 target_include_directories(${PROJECT_NAME} PRIVATE ${GLEW_INCLUDE_DIR})
+# GLM
+find_package(glm REQUIRED)
+target_include_directories(${PROJECT_NAME} PRIVATE ${GLM_INCLUDE_DIR})
 
 target_link_directories(${PROJECT_NAME} PRIVATE "${SDL2_BUILD_DIR}/$<CONFIG>")
 
@@ -37,6 +40,7 @@ if(WIN32)
   target_link_libraries(${PROJECT_NAME} SDL2 SDL2main)
   target_link_libraries(${PROJECT_NAME} ${GLEW_LIBRARY})
   target_link_libraries(${PROJECT_NAME} opengl32)
+  target_link_libraries(${PROJECT_NAME} glm::glm)
 else()
   target_link_libraries(${PROJECT_NAME} SDL2)
 endif()
