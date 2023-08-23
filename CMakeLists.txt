@@ -1,5 +1,5 @@
 # /CMakeLists.txt
-cmake_minimum_required(VERSION 3.6)
+cmake_minimum_required(VERSION 3.1)
 
 project(AutomataForge)
 
@@ -36,7 +36,7 @@ target_link_directories(${PROJECT_NAME} PRIVATE "${SDL2_BUILD_DIR}/$<CONFIG>")
 if(WIN32)
   message(STATUS "Configuring for Windows")
   set_target_properties(${PROJECT_NAME} PROPERTIES LINK_FLAGS "/SUBSYSTEM:CONSOLE")
-  target_link_libraries(${PROJECT_NAME} SDL2 SDL2main)
+  target_link_libraries(${PROJECT_NAME} optimized SDL2 debug SDL2d optimized SDL2main debug SDL2maind)
   target_link_libraries(${PROJECT_NAME} ${GLEW_LIBRARY})
   target_link_libraries(${PROJECT_NAME} opengl32)
 else()
