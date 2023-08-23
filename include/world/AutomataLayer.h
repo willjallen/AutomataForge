@@ -7,6 +7,8 @@
 #include "engine/ShaderManager.h"
 #include "engine/QuadRenderer.h"
 
+const std::string TEXTURE_NAME = "AUTOMATA_TEXTURE";
+
 class AutomataLayer : public Layer{
     public: 
         /**
@@ -21,9 +23,9 @@ class AutomataLayer : public Layer{
                         unsigned int height,
                         unsigned int numStates,
                         std::string rewriteRule, 
-                        std::shared_ptr<TextureManager> textureManager,
                         std::shared_ptr<ShaderManager> shaderManager,
-                        QuadRenderer &quadRenderer);
+                        std::shared_ptr<TextureManager> textureManager,
+                        std::shared_ptr<QuadRenderer> quadRenderer);
         /**
          * @brief Destroy the Automata Layer object
          * 
@@ -55,6 +57,6 @@ class AutomataLayer : public Layer{
         std::string rewriteRule;
         std::shared_ptr<TextureManager> textureManager;
         std::shared_ptr<ShaderManager> shaderManager;
-        QuadRenderer quadRenderer;
+        std::shared_ptr<QuadRenderer> quadRenderer;
 
 };

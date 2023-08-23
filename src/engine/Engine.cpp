@@ -12,16 +12,14 @@ Engine::Engine(){
 	this->shaderManager = std::make_shared<ShaderManager>();
 
     // Start texture manager
-    this->textureManager = std::make_shared<TextureManager>();
+    this->textureManager = std::make_shared<TextureManager>(this->shaderManager);
     
     // Create the world
-    this->world = std::make_unique<World>(this->shaderManager, this->textureManager);
+    this->world = std::make_unique<World>(WINDOW_WIDTH, WINDOW_HEIGHT, this->shaderManager, this->textureManager);
 
 }
 
-Engine::~Engine(){
-
-}
+Engine::~Engine(){}
 
 void Engine::start(){
 	bool running = true;
@@ -30,7 +28,7 @@ void Engine::start(){
 	SDL_StartTextInput();
 
 	// Desired frame rate (set to 0 if no limit is desired)
-	const int TARGET_FPS = 0;
+	const int TARGET_FPS = 1;
 	const int TARGET_FRAME_DURATION = TARGET_FPS > 0 ? 1000 / TARGET_FPS : 0;
 
 	// Variables to keep track of the frame time and frame count
@@ -59,7 +57,11 @@ void Engine::start(){
 			timeElapsed = 0;
 		}
 
+		// Update the engine
+		this->update();
 
+		// Render the engine
+		this->render();
 
 		// Update screen
 		this->window->swapBuffers();
@@ -81,12 +83,18 @@ void Engine::start(){
 	SDL_StopTextInput();
 }
 
-void Engine::stop(){
+void Engine::stop(){}
 
+void Engine::update(){
+	this->world->update();
 }
 
 void Engine::render(){
 
+	// Clear the screen
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	this->world->render();
 }
 
 

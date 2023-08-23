@@ -30,7 +30,7 @@ public:
      * @brief Update the content of the texture.
      * @param data Pointer to the new data.
      */
-    void update(const std::vector<float>& data);
+    void setData(const std::vector<float>& data);
 
     /**
      * @brief Get the Texture ID

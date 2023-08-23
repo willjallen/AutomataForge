@@ -14,3 +14,8 @@ Bit mask in shaders
 Custom one-time compute workgroup/layout size optimization program
 
 Shader optimizer (run through configurations of work groups and find the best one)
+
+cmake should rebuild SDL for debug builds
+
+Setting the wrong uniform datatype (i.e unsigned int to an int) is a problem. Should probably 
+define a static map of constants for that somewhere

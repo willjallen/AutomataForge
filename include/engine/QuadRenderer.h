@@ -1,5 +1,7 @@
 #pragma once
+#include <memory>
 #include <GL/glew.h>
+#include "engine/ShaderManager.h"
 
 /**
  * @class QuadRenderer
@@ -16,8 +18,10 @@ class QuadRenderer {
          *
          * Creates the Vertex Array Object and Vertex Buffer Object
          * and sets up the necessary OpenGL state to render the quad.
+         * Also sets up the quad shader.
+         * @param shaderManager The shader manager.
          */
-        QuadRenderer();
+        QuadRenderer(std::shared_ptr<ShaderManager> shaderManager);
 
         /**
          * @brief Renders the full-screen quad.
@@ -29,6 +33,9 @@ class QuadRenderer {
         void render();
 
     private:
+
+        std::shared_ptr<ShaderManager> shaderManager;
+
         GLuint quadVAO; // Vertex Array Object for the quad.
         GLuint quadVBO; // Vertex Buffer Object for the quad vertices.
 };

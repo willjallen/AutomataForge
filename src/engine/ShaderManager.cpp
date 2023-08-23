@@ -61,21 +61,11 @@ Shader* ShaderManager::getShader(const std::string &name) {
     throw std::runtime_error("Attempted to get shader " + name + " but shader was not found.");
 }
 
-template <typename T>
-bool ShaderManager::setUniform(const std::string& shaderName, const std::string& uniformName, T value) {
-    Shader* shader = getShader(shaderName); // Exception will be thrown if shader does not exist
-    
-    // Activate the shader
-    shader->use();
-
-    // Use appropriate method in Shader class based on the type T
-    shader->setUniform(uniformName, value);
-
-    // Check for OpenGL errors
-    GLenum error = glGetError();
-    if (error != GL_NO_ERROR) {
-        throw std::runtime_error("OpenGL error setting uniform '" + uniformName + "' in shader '" + shaderName + "'.");
-    }
-
-    return true;
+GLint ShaderManager::getUniformBindingPoint(const std::string& shaderProgramName, const std::string& uniformName) {
+    return getShader(shaderProgramName)->getUniformBindingPoint(uniformName);
 }
+
+void ShaderManager::useShader(const std::string &name){
+    this->getShader(name)->use();
+}
+

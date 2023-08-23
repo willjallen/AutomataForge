@@ -2,6 +2,7 @@
 
 #include <string>
 #include <unordered_map>
+#include "engine/ShaderManager.h"   
 #include "engine/Texture.h"
 
 /**
@@ -17,7 +18,7 @@ public:
     /**
      * @brief Construct a new Texture Manager object.
      */
-    TextureManager();
+    TextureManager(std::shared_ptr<ShaderManager> shaderManager);
 
     /**
      * @brief Frees all textures stored in textures map.
@@ -33,6 +34,13 @@ public:
      * @return True if the texture was created successfully, false otherwise.
      */
     bool createTexture(const std::string &name, GLsizei width, GLsizei height, std::vector<float>& data);
+    
+    /**
+     * @brief Unloads a texture by name.
+     * @param name Name or identifier for the texture.
+     */
+    void unloadTexture(const std::string &name);
+
 
     /**
      * @brief Retrieves a texture by name.
@@ -59,12 +67,6 @@ public:
      * @throws std::runtime_error if not found
      */
     GLuint getImageUnit(const std::string &name);
-
-    /**
-     * @brief Unloads a texture by name.
-     * @param name Name or identifier for the texture.
-     */
-    void unloadTexture(const std::string &name);
 
 
     /**
@@ -108,7 +110,7 @@ public:
      * @param uniformName The name of the uniform variable in the shader to bind the texture unit to
      * @throws std::runtime_error if the uniform location is not found  
      */
-    void TextureManager::bindTextureUnitToGeneralShader(const std::string &textureName, GLuint shaderProgramID, const std::string &uniformName);
+    void TextureManager::bindTextureUnitToGeneralShader(const std::string &textureName, const std::string &shaderProgramName, const std::string &uniformName);
 
     /**
      * @brief Binds an existing image unit to a compute shader 
@@ -118,8 +120,10 @@ public:
      * @param uniformName The name of the uniform variable in the shader to bind the texture unit to
      * @throws std::runtime_error if the uniform location is not found  
      */
-    void TextureManager::bindImageUnitToComputeShader(const std::string &textureName, GLuint shaderProgramID, const std::string &uniformName);
+    void TextureManager::bindImageUnitToComputeShader(const std::string &textureName, const std::string &shaderProgramName, const std::string &uniformName);
 private:
+
+    std::shared_ptr<ShaderManager> shaderManager; 
 
     GLint maxTextureImageUnits;
     GLint maxImageUnits;

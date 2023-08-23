@@ -16,26 +16,23 @@ Texture::Texture(GLsizei width, GLsizei height, const std::vector<float> data){
 
 
     // Declare a variable to hold the texture ID
-	GLuint texture;
+	GLuint textureID;
 
+	GLenum error = glGetError();
 	// Generate a new texture object, storing the ID in 'texture'
-	glGenTextures(1, &texture);
-
-
-
+	glGenTextures(1, &textureID);
+	error = glGetError();
 	// Bind the texture object to the 2D texture target, making it the active texture
-	glBindTexture(GL_TEXTURE_2D, texture);
-
-	// Bind the texture object to an image unit for reading and writing within a shader
-	glBindImageTexture(this->textureUnit, this->textureID, 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA32F);
-    
+	glBindTexture(GL_TEXTURE_2D, textureID);
+	error = glGetError();
 	// TODO: Allow precise specifications of these parameters upon object creation. Maybe passing a config struct
+	
 	// Set the texture wrapping mode for the S (horizontal) coordinate to CLAMP_TO_EDGE
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-
+	error = glGetError();
 	// Set the texture wrapping mode for the T (vertical) coordinate to CLAMP_TO_EDGE
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
+	error = glGetError();
 	// Set the magnification filter to linear interpolation (smoothing effect when scaling up)
 	// glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	// Set the minification filter to linear interpolation (smoothing effect when scaling down)
@@ -44,14 +41,16 @@ Texture::Texture(GLsizei width, GLsizei height, const std::vector<float> data){
 	// Avoid any interpolation between pixels (black and white only)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-
+	error = glGetError();
+	// Allocate memory and specify the 2D texture image format (e.g., RGBA32F), size, and data type
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, this->width, this->height, 0, GL_RGBA, GL_FLOAT, NULL);
+	error = glGetError();
 	// Set texture ID
 	this->textureID = textureID;
 	
-    // Initialize with data
-    this->update(data);
-
-
+	if(data.size() > 0){
+		setData(data);
+	}
 
 }
 
@@ -62,7 +61,7 @@ Texture::~Texture(){
 
 
 // TODO: Allow for definable texture dimensions / more flexibility
-void Texture::update(const std::vector<float>& data){
+void Texture::setData(const std::vector<float>& data){
 
 	if (data.size() != this->width * this->height * 4) {
 		throw std::runtime_error("Data size does not match texture dimensions");
@@ -71,20 +70,11 @@ void Texture::update(const std::vector<float>& data){
 	// Obtain a pointer to the underlying data
     const float* dataPtr = data.data();
 	
-	// Allocate memory and specify the 2D texture image format (e.g., RGBA32F), size, and data type
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, this->width, this->height, 0, GL_RGBA, GL_FLOAT, NULL);
-
-
-	// Activate the texture unit and re-bind the texture object to the 2D target
-	glActiveTexture(GL_TEXTURE0 + this->textureUnit);
-
-	// Bind the texture object to the 2D texture target
-	glBindTexture(GL_TEXTURE_2D, this->textureID);
-
 	// Upload the buffer to the texture
+	GLenum error = glGetError();
 	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, this->width, this->height, GL_RGBA, GL_FLOAT, dataPtr);
-
-
+	error = glGetError();
+	;;
 }
 
 GLuint Texture::getTextureID(){

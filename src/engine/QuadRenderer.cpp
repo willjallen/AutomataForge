@@ -1,7 +1,15 @@
 #include "engine/QuadRenderer.h"
 #include <GL/glew.h>
 
-QuadRenderer::QuadRenderer() {
+
+QuadRenderer::QuadRenderer(std::shared_ptr<ShaderManager> shaderManager) {
+
+    // Set up variables
+    this->shaderManager = shaderManager;
+
+    // Set up shader
+	shaderManager->loadShader("screen_quad", "shaders/screen_quad_vertex.glsl", "shaders/screen_quad_fragment.glsl");
+    
     // Quad vertices representing positions and texture coordinates
     float quadVertices[] = {
         // positions        // texture Coords
@@ -33,8 +41,11 @@ QuadRenderer::QuadRenderer() {
 }
 
 void QuadRenderer::render() {
+
+    this->shaderManager->useShader("screen_quad");
+
     // Bind the VAO containing the quad's vertex attributes
-    glBindVertexArray(quadVAO);
+    glBindVertexArray(this->quadVAO);
 
     // Draw the quad as a triangle strip
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);

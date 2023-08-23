@@ -3,6 +3,8 @@
 #include <string>
 #include <GL/glew.h>
 #include <glm/glm.hpp> 
+#include <stdexcept>
+#include <glm/gtc/type_ptr.hpp>
 
 class Shader {
 public:
@@ -32,9 +34,118 @@ public:
     ~Shader();
 
     /**
-     * @brief Activates the shader program for rendering.
+     * @brief Activates the shader program.
      */
     void use();
+
+    /**
+     * @brief Get the binding point of a uniform within the shader program.
+     * @param uniformName The name of the uniform variable. 
+     * @return GLint The location of the uniform variable, or -1 if the uniform variable does not exist
+     * @throws std::runtime_error if the uniform variable is not found.
+     */
+    GLint getUniformBindingPoint(const std::string& uniformName);
+    
+    /**
+     * @brief Retrieves the location of a uniform variable within the shader program.
+     * @param name The name of the uniform variable.
+     * @return GLint The location of the uniform variable, or -1 if the uniform variable does not exist.
+     * @throws std::runtime_error if the uniform variable is not found.
+     */
+    GLint getUniformLocation(const std::string &uniformName) const;
+    
+    /** @brief General template method for setting uniform values.
+     *  @details This function is a catch-all for unsupported types and will throw a runtime error.
+     *  @param uniformName The name of the uniform variable.
+     *  @param value The value to be set.
+     *  @throws std::runtime_error if the uniform type is not supported.
+     */
+    template <typename T>
+    void setUniform(const std::string &uniformName, T value) {
+        throw std::runtime_error("Uniform type not supported.");
+    }
+
+    /** @brief Specialization for float.
+     *  @param uniformName The name of the uniform variable.
+     *  @param value The float value to be set.
+     */
+    template <>
+    void setUniform<float>(const std::string &uniformName, float value) {
+        glUniform1f(getUniformLocation(uniformName), value);
+    }
+
+    /** @brief Specialization for int.
+     *  @param uniformName The name of the uniform variable.
+     *  @param value The int value to be set.
+     */
+    template <>
+    void setUniform<int>(const std::string &uniformName, int value) {
+        glUniform1i(getUniformLocation(uniformName), value);
+    }
+
+    /** @brief Specialization for unsigned int.
+     *  @param uniformName The name of the uniform variable.
+     *  @param value The unsigned int value to be set.
+     */
+    template <>
+    void setUniform<unsigned int>(const std::string &uniformName, unsigned int value) {
+        glUniform1ui(getUniformLocation(uniformName), value);
+    }
+
+    /** @brief Specialization for glm::vec2.
+     *  @param uniformName The name of the uniform variable.
+     *  @param value The glm::vec2 value to be set.
+     */
+    template <>
+    void setUniform<glm::vec2>(const std::string &uniformName, glm::vec2 value) {
+        glUniform2fv(getUniformLocation(uniformName), 1, glm::value_ptr(value));
+    }
+
+    /** @brief Specialization for glm::vec3.
+     *  @param uniformName The name of the uniform variable.
+     *  @param value The glm::vec3 value to be set.
+     */
+    template <>
+    void setUniform<glm::vec3>(const std::string &uniformName, glm::vec3 value) {
+        glUniform3fv(getUniformLocation(uniformName), 1, glm::value_ptr(value));
+    }
+
+    /** @brief Specialization for glm::vec4.
+     *  @param uniformName The name of the uniform variable.
+     *  @param value The glm::vec4 value to be set.
+     */
+    template <>
+    void setUniform<glm::vec4>(const std::string &uniformName, glm::vec4 value) {
+        glUniform4fv(getUniformLocation(uniformName), 1, glm::value_ptr(value));
+    }
+
+    /** @brief Specialization for glm::mat2.
+     *  @param uniformName The name of the uniform variable.
+     *  @param value The glm::mat2 value to be set.
+     */
+    template <>
+    void setUniform<glm::mat2>(const std::string &uniformName, glm::mat2 value) {
+        glUniformMatrix2fv(getUniformLocation(uniformName), 1, GL_FALSE, glm::value_ptr(value));
+    }
+
+    /** @brief Specialization for glm::mat3.
+     *  @param uniformName The name of the uniform variable.
+     *  @param value The glm::mat3 value to be set.
+     */
+    template <>
+    void setUniform<glm::mat3>(const std::string &uniformName, glm::mat3 value) {
+        glUniformMatrix3fv(getUniformLocation(uniformName), 1, GL_FALSE, glm::value_ptr(value));
+    }
+
+    /** @brief Specialization for glm::mat4.
+     *  @param uniformName The name of the uniform variable.
+     *  @param value The glm::mat4 value to be set.
+     */
+    template <>
+    void setUniform<glm::mat4>(const std::string &uniformName, glm::mat4 value) {
+        glUniformMatrix4fv(getUniformLocation(uniformName), 1, GL_FALSE, glm::value_ptr(value));
+    }
+
 
 
 private:
@@ -58,84 +169,7 @@ private:
      */
     void checkCompileErrors(GLuint shader, const std::string &type);
 
-    /**
-     * @brief Retrieves the location of a uniform variable within the shader program.
-     * @param name The name of the uniform variable.
-     * @return The location of the uniform variable, or -1 if the uniform variable does not exist.
-     * @throws std::runtime_error if the uniform variable is not found.
-     */
-    GLint getUniformLocation(const std::string &uniformName) const;
 
-    /**
-     * @brief General templated method for setting uniform values (catch-all for unsupported types).
-     * @param name Name of the uniform variable.
-     * @param value Value to set.
-     * @throw std::runtime_error Throws an error if the type is not supported.
-     */
-    template <typename T>
-    void setUniform(const std::string &name, T value);
 
-    /**
-     * @brief Sets a float uniform value in the shader program.
-     * @param name Name of the uniform variable.
-     * @param value Float value to set.
-     */
-    template <>
-    void setUniform<float>(const std::string &name, float value);
-
-    /**
-     * @brief Sets an int uniform value in the shader program.
-     * @param name Name of the uniform variable.
-     * @param value Int value to set.
-     */
-    template <>
-    void setUniform<int>(const std::string &name, int value);
-
-    /**
-     * @brief Sets a glm::vec2 uniform value in the shader program.
-     * @param name Name of the uniform variable.
-     * @param value glm::vec2 value to set.
-     */
-    template <>
-    void setUniform<glm::vec2>(const std::string &name, glm::vec2 value);
-
-    /**
-     * @brief Sets a glm::vec3 uniform value in the shader program.
-     * @param name Name of the uniform variable.
-     * @param value glm::vec3 value to set.
-     */
-    template <>
-    void setUniform<glm::vec3>(const std::string &name, glm::vec3 value);
-
-    /**
-     * @brief Sets a glm::vec4 uniform value in the shader program.
-     * @param name Name of the uniform variable.
-     * @param value glm::vec4 value to set.
-     */
-    template <>
-    void setUniform<glm::vec4>(const std::string &name, glm::vec4 value);
-
-    /**
-     * @brief Sets a glm::mat2 uniform value in the shader program.
-     * @param name Name of the uniform variable.
-     * @param value glm::mat2 value to set.
-     */
-    template <>
-    void setUniform<glm::mat2>(const std::string &name, glm::mat2 value);
-
-    /**
-     * @brief Sets a glm::mat3 uniform value in the shader program.
-     * @param name Name of the uniform variable.
-     * @param value glm::mat3 value to set.
-     */
-    template <>
-    void setUniform<glm::mat3>(const std::string &name, glm::mat3 value);
-
-    /**
-     * @brief Sets a glm::mat4 uniform value in the shader program.
-     * @param name Name of the uniform variable.
-     * @param value glm::mat4 value to set.
-     */
-    template <>
-    void setUniform<glm::mat4>(const std::string &name, glm::mat4 value);
+  
 };

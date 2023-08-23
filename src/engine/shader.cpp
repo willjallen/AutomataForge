@@ -2,7 +2,6 @@
 #include <fstream>
 #include <sstream>
 #include <stdexcept>
-#include <glm/gtc/type_ptr.hpp>
 
 #include "engine/Shader.h"
 
@@ -58,59 +57,14 @@ GLint Shader::getUniformLocation(const std::string &uniformName) const {
     }
     return location;
 }
-// General templated method (catch-all for unsupported types)
-template <typename T>
-void Shader::setUniform(const std::string &uniformName, T value) {
-    throw std::runtime_error("Uniform type not supported.");
+
+GLint Shader::getUniformBindingPoint(const std::string& uniformName) {
+    GLint location = getUniformLocation(uniformName);
+    GLint bindingPoint;
+    glGetUniformiv(this->programID, location, &bindingPoint);
+    return bindingPoint;
 }
 
-// Specialization for float
-template <>
-void Shader::setUniform<float>(const std::string &uniformName, float value) {
-    glUniform1f(getUniformLocation(uniformName), value);
-}
-
-// Specialization for int
-template <>
-void Shader::setUniform<int>(const std::string &uniformName, int value) {
-    glUniform1i(getUniformLocation(uniformName), value);
-}
-
-// Specialization for glm::vec2
-template <>
-void Shader::setUniform<glm::vec2>(const std::string &uniformName, glm::vec2 value) {
-    glUniform2fv(getUniformLocation(uniformName), 1, glm::value_ptr(value));
-}
-
-// Specialization for glm::vec3
-template <>
-void Shader::setUniform<glm::vec3>(const std::string &uniformName, glm::vec3 value) {
-    glUniform3fv(getUniformLocation(uniformName), 1, glm::value_ptr(value));
-}
-
-// Specialization for glm::vec4
-template <>
-void Shader::setUniform<glm::vec4>(const std::string &uniformName, glm::vec4 value) {
-    glUniform4fv(getUniformLocation(uniformName), 1, glm::value_ptr(value));
-}
-
-// Specialization for glm::mat2
-template <>
-void Shader::setUniform<glm::mat2>(const std::string &uniformName, glm::mat2 value) {
-    glUniformMatrix2fv(getUniformLocation(uniformName), 1, GL_FALSE, glm::value_ptr(value));
-}
-
-// Specialization for glm::mat3
-template <>
-void Shader::setUniform<glm::mat3>(const std::string &uniformName, glm::mat3 value) {
-    glUniformMatrix3fv(getUniformLocation(uniformName), 1, GL_FALSE, glm::value_ptr(value));
-}
-
-// Specialization for glm::mat4
-template <>
-void Shader::setUniform<glm::mat4>(const std::string &uniformName, glm::mat4 value) {
-    glUniformMatrix4fv(getUniformLocation(uniformName), 1, GL_FALSE, glm::value_ptr(value));
-}
 
 GLuint Shader::loadShader(const std::string &path, GLenum shaderType) {
     std::ifstream file(path);

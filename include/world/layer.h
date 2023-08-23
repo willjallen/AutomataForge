@@ -1,4 +1,5 @@
 #pragma once
+#include "engine/QuadRenderer.h"
 
 class Layer {
 
@@ -10,7 +11,7 @@ class Layer {
         virtual void render() = 0;
 
     protected:
-        int width, height;
+        unsigned int width, height;
 
 };
 

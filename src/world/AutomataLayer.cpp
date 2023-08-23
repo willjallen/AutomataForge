@@ -10,7 +10,13 @@
 #include "engine/QuadRenderer.h"
 #include "world/AutomataLayer.h"
 
-AutomataLayer::AutomataLayer(unsigned int width, unsigned int height, unsigned int numStates, std::string rewriteRule, std::shared_ptr<TextureManager> textureManager, std::shared_ptr<ShaderManager> shaderManager, QuadRenderer &quadRenderer){
+AutomataLayer::AutomataLayer(unsigned int width, 
+							 unsigned int height, 
+							 unsigned int numStates, 
+							 std::string rewriteRule, 
+							 std::shared_ptr<ShaderManager> shaderManager, 
+							 std::shared_ptr<TextureManager> textureManager, 
+							 std::shared_ptr<QuadRenderer> quadRenderer) : quadRenderer(quadRenderer){
 
 	// Set variables
 	this->width = width;
@@ -22,24 +28,42 @@ AutomataLayer::AutomataLayer(unsigned int width, unsigned int height, unsigned i
 	this->shaderManager = shaderManager;
 	this->quadRenderer = quadRenderer;
 
+	GLenum error = glGetError();
 	// Set up compute shader
 	shaderManager->loadComputeShader("game_of_life_compute", "shaders/game_of_life_compute.glsl");
+	
+	shaderManager->setUniform("game_of_life_compute", "textureSize", 1920);	
+	
+	// Set up texture
+	// Create a buffer for the initial state
+	std::vector<float> initialState(this->width * this->height * 4);
 
-	// // Create a buffer for the initial state
-	// float* initialState = new float[TEXTURE_WIDTH * TEXTURE_HEIGHT * 4];
+	// Populate the buffer with the initial state
+	for (unsigned int y = 0; y < this->height; y++) { // Use height here
+		for (unsigned int x = 0; x < this->width; x++) { // Use width here
+			int index = (y * this->width + x) * 4;
+			float value = (rand() % 100 < 99) ? 1.0f : 0.0f; // You mentioned a 10% chance, but this line gives a 1% chance
+			initialState[index] = value; // Red channel (use this for the state)
+			initialState[index + 1] = value; // Green channel
+			initialState[index + 2] = value; // Blue channel
+			initialState[index + 3] = 1.0f; // Alpha channel (always 1)
+		}
+	}
 
-	// // Populate the buffer with the initial state
-	// for (int y = 0; y < TEXTURE_HEIGHT; y++) {
-	// 	for (int x = 0; x < TEXTURE_WIDTH; x++) {
-	// 	int index = (y * TEXTURE_WIDTH + x) * 4;
-	// 	float value = (rand() % 100 < 1) ? 1.0f : 0.0f; // 10% chance of being alive
-	// 	// float value = 1.0f;
-	// 	initialState[index] = value; // Red channel (use this for the state)
-	// 	initialState[index + 1] = value; // Green channel
-	// 	initialState[index + 2] = value; // Blue channel
-	// 	initialState[index + 3] = 1.0f; // Alpha channel (always 1)
-	// 	}
-	// }
+	// Create texture
+	textureManager->createTexture(TEXTURE_NAME, this->width, this->height, initialState);
+	
+	// Bind texture to an image unit
+	textureManager->bindImageUnit(TEXTURE_NAME);
+	
+	// Bind image unit to compute shader imgOutput
+	textureManager->bindImageUnitToComputeShader(TEXTURE_NAME, "game_of_life_compute", "imgOutput");
+
+	// Bind texture to a texture unit
+	textureManager->bindTextureUnit(TEXTURE_NAME);
+
+	// Bind texture unit to quad renderer shader uniform sampler2D tex
+	textureManager->bindTextureUnitToGeneralShader(TEXTURE_NAME, "screen_quad", "tex");
 
 }
 
@@ -52,32 +76,20 @@ void AutomataLayer::reset(){
 }
 
 void AutomataLayer::update(){
+	shaderManager->useShader("game_of_life_compute");
+	
+	// Divide the dispatch by local workgroup size (10 in this case)
+	glDispatchCompute(this->width / 10, this->height / 10, 1);
 
+	// make sure writing to image has finished before read
+	glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
 }
 
 void AutomataLayer::render() {
 
+		// render image to quad
+		
+		this->quadRenderer->render();
+		
 }
 
-	// shaderManager.loadShader("screen_quad", "shaders/screen_quad_vertex.glsl", "shaders/screen_quad_fragment.glsl");
-
-	// Shader* computeShader = shaderManager.getShader("basic_compute");
-	// computeShader->use();
-	// computeShader->setUniformInt("textureSize", (int)TEXTURE_WIDTH);
-	// Shader* screenQuad = shaderManager.getShader("screen_quad");
-	// screenQuad->use();
-	// screenQuad->setUniformInt("text", (int)0);
-
-		// computeShader->use();
-		
-		// Divide the dispatch by local workgroup size (10 in this case)
-		// glDispatchCompute(TEXTURE_WIDTH / 10, TEXTURE_HEIGHT / 10, 1);
-
-		// make sure writing to image has finished before read
-		// glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
-
-		// render image to quad
-		// glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		// screenQuad->use();
-		
-		// renderQuad();
