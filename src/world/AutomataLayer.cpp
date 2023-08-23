@@ -1,6 +1,7 @@
 #include <gl\glew.h>
 #include <SDL_opengl.h>
 #include <gl\glu.h>
+#include <glm\glm.hpp>
 
 #include <memory>
 #include <string>
@@ -33,18 +34,18 @@ AutomataLayer::AutomataLayer(unsigned int width,
 	shaderManager->loadComputeShader("game_of_life_compute", "shaders/game_of_life_compute.glsl");
 
 	// TODO: FIX THIS	
-	shaderManager->setUniform("game_of_life_compute", "textureSize", (GLint)this->height*8);	
+	shaderManager->setUniform("game_of_life_compute", "textureSize", glm::ivec2(this->width, this->height));	
 	
 	// Set up texture
 	// Create a buffer for the initial state
 	std::vector<float> initialState(this->width * this->height * 4, 0.0f);
 
 	// Populate the buffer with the initial state
-	for (unsigned int y = 0; y < 600; y++) { // Use height here
-		for (unsigned int x = 0; x < 600; x++) { // Use width here
-			int index = (y * 600 + x) * 4;
-			// float value = (rand() % 100 < 1) ? 1.0f : 0.0f; // You mentioned a 10% chance, but this line gives a 1% chance
-			float value = 1.0f;
+	for (unsigned int y = 0; y < this->height; y++) { // Use height here
+		for (unsigned int x = 0; x < this->width; x++) { // Use width here
+			int index = (y * this->width + x) * 4;
+			float value = (rand() % 100 < 50) ? 1.0f : 0.0f; // You mentioned a 10% chance, but this line gives a 1% chance
+			// float value = 1.0f;
 			initialState[index] = value; // Red channel (use this for the state)
 			initialState[index + 1] = value; // Green channel
 			initialState[index + 2] = value; // Blue channel
@@ -81,7 +82,7 @@ void AutomataLayer::update(){
 	shaderManager->useShader("game_of_life_compute");
 	
 	// Divide the dispatch by local workgroup size (10 in this case)
-	glDispatchCompute(this->width / 10, this->height / 10, 1);
+	glDispatchCompute(this->width / 8, this->height / 8, 1);
 
 	// make sure writing to image has finished before read
 	glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);

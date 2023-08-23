@@ -1,10 +1,10 @@
 #version 430 core
 
-layout (local_size_x = 10, local_size_y = 10, local_size_z = 1) in;
+layout (local_size_x = 8, local_size_y = 8, local_size_z = 1) in;
 
 // uniforms
 layout(rgba32f, binding = 0) uniform image2D imgOutput;
-layout (location = 1) uniform int textureSize; 
+layout (location = 1) uniform ivec2 textureSize; // textureSize.x is width, textureSize.y is height
 
 void main() {
   ivec2 texelCoord = ivec2(gl_GlobalInvocationID.xy);
@@ -17,7 +17,9 @@ void main() {
   for (int dx = -1; dx <= 1; ++dx) {
     for (int dy = -1; dy <= 1; ++dy) {
       if (dx == 0 && dy == 0) continue; // Skip the center cell
-      ivec2 neighborCoord = (texelCoord + ivec2(dx, dy) + textureSize) % textureSize; // Wrap around
+      int neighborX = (texelCoord.x + dx + textureSize.x) % textureSize.x;
+      int neighborY = (texelCoord.y + dy + textureSize.y) % textureSize.y;
+      ivec2 neighborCoord = ivec2(neighborX, neighborY);
       vec4 neighbor = imageLoad(imgOutput, neighborCoord);
       aliveNeighbors += int(neighbor.x > 0.5);
     }

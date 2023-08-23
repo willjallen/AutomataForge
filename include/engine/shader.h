@@ -93,6 +93,7 @@ public:
     }
 
     /** @brief Specialization for glm::vec2.
+     *  2 components vector of floating-point numbers.
      *  @param uniformName The name of the uniform variable.
      *  @param value The glm::vec2 value to be set.
      */
@@ -101,7 +102,18 @@ public:
         glUniform2fv(getUniformLocation(uniformName), 1, glm::value_ptr(value));
     }
 
+    /** @brief Specialization for glm::ivec2.
+     *  2 components vector of signed integer numbers.
+     *  @param uniformName The name of the uniform variable.
+     *  @param value The glm::ivec2 value to be set.
+     */
+    template <>
+    void setUniform<glm::ivec2>(const std::string &uniformName, glm::ivec2 value) {
+        glUniform2iv(getUniformLocation(uniformName), 1, glm::value_ptr(value));
+    }
+
     /** @brief Specialization for glm::vec3.
+     *  3 components vector of floating-point numbers.
      *  @param uniformName The name of the uniform variable.
      *  @param value The glm::vec3 value to be set.
      */
@@ -111,6 +123,7 @@ public:
     }
 
     /** @brief Specialization for glm::vec4.
+     *  4 components vector of floating-point numbers.
      *  @param uniformName The name of the uniform variable.
      *  @param value The glm::vec4 value to be set.
      */
