@@ -5,8 +5,8 @@
 #include "engine/TextureManager.h"
 #include "world/World.h"
 
-const unsigned int WINDOW_WIDTH = 1920;
-const unsigned int WINDOW_HEIGHT = 1080;
+const unsigned int WINDOW_WIDTH = 600;
+const unsigned int WINDOW_HEIGHT = 600;
 
 const std::string WINDOW_NAME = "AutomataForge";
 
