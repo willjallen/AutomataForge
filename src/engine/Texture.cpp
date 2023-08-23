@@ -79,28 +79,49 @@ void Texture::setData(const std::vector<float>& data){
 	// 	}
 	// }
 
-	// Create a buffer for the initial state
-	float* initialState = new float[600 * 600 * 4];
+
 
 	// Populate the buffer with the initial state
-	for (int y = 0; y < 600; y++) {
-		for (int x = 0; x < 600; x++) {
-		int index = (y * 600 + x) * 4;
-		float value = (rand() % 100 < 10) ? 1.0f : 0.0f; // 10% chance of being alive
-		initialState[index] = value; // Red channel (use this for the state)
-		initialState[index + 1] = value; // Green channel
-		initialState[index + 2] = value; // Blue channel
-		initialState[index + 3] = 1.0f; // Alpha channel (always 1)
+	// Create a buffer for the initial state
+	// float* initialState = new float[600 * 600 * 4];
+	// for (int y = 0; y < 600; y++) {
+	// 	for (int x = 0; x < 600; x++) {
+	// 	int index = (y * 600 + x) * 4;
+	// 	// float value = 0.0f;
+	// 	float value = (rand() % 100 < 40) ? 1.0f : 0.0f; // 10% chance of being alive
+	// 	initialState[index] = value; // Red channel (use this for the state)
+	// 	initialState[index + 1] = value; // Green channel
+	// 	initialState[index + 2] = value; // Blue channel
+	// 	initialState[index + 3] = 1.0f; // Alpha channel (always 1)
+	// 	}
+	// }
+
+	// float* dataPtr = initialState;
+
+	// // Create a buffer for the initial state
+	std::vector<float> initialState(this->width * this->height * 4, 0.0f); // Initialize all elements to 0.0
+
+	// // Populate the buffer with the initial state
+	for (int y = 0; y < this->height; y++) {
+		for (int x = 0; x < this->width; x++) {
+			int index = (y * this->height + x) * 4;
+			float value = (rand() % 100 < 40) ? 1.0f : 0.0f; // 10% chance of being alive
+			initialState[index] = value;     // Red channel (use this for the state)
+			initialState[index + 1] = value; // Green channel
+			initialState[index + 2] = value; // Blue channel
+			initialState[index + 3] = 1.0f;  // Alpha channel (always 1)
 		}
 	}
-	// Obtain a pointer to the underlying data
-    const float* dataPtr = data.data();
+	// // Obtain a pointer to the underlying data
+    const float* dataPtr = initialState.data();
 	
 	// Upload the buffer to the texture
-	GLenum error = glGetError();
 	glBindTexture(GL_TEXTURE_2D, textureID);
-	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, this->width, this->height, GL_RGBA, GL_FLOAT, initialState);
-	error = glGetError();
+	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, this->width, this->height, GL_RGBA, GL_FLOAT, dataPtr);
+	GLenum error = glGetError();
+	if (error != GL_NO_ERROR) {
+		printf("OpenGL Error: %d\n", error);
+	}
 	;;
 }
 

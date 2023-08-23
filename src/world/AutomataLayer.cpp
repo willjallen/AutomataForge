@@ -36,12 +36,12 @@ AutomataLayer::AutomataLayer(unsigned int width,
 	
 	// Set up texture
 	// Create a buffer for the initial state
-	std::vector<float> initialState(this->width * this->height * 4);
+	std::vector<float> initialState(this->width * this->height * 4, 0.0f);
 
 	// Populate the buffer with the initial state
-	for (unsigned int y = 0; y < this->height; y++) { // Use height here
-		for (unsigned int x = 0; x < this->width; x++) { // Use width here
-			int index = (y * this->width + x) * 4;
+	for (unsigned int y = 0; y < 600; y++) { // Use height here
+		for (unsigned int x = 0; x < 600; x++) { // Use width here
+			int index = (y * 600 + x) * 4;
 			// float value = (rand() % 100 < 1) ? 1.0f : 0.0f; // You mentioned a 10% chance, but this line gives a 1% chance
 			float value = 1.0f;
 			initialState[index] = value; // Red channel (use this for the state)

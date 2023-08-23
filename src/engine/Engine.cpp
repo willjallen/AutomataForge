@@ -28,7 +28,7 @@ void Engine::start(){
 	SDL_StartTextInput();
 
 	// Desired frame rate (set to 0 if no limit is desired)
-	const int TARGET_FPS = 1;
+	const int TARGET_FPS = 60;
 	const int TARGET_FRAME_DURATION = TARGET_FPS > 0 ? 1000 / TARGET_FPS : 0;
 
 	// Variables to keep track of the frame time and frame count
