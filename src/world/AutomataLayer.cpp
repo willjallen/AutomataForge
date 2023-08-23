@@ -31,8 +31,9 @@ AutomataLayer::AutomataLayer(unsigned int width,
 	GLenum error = glGetError();
 	// Set up compute shader
 	shaderManager->loadComputeShader("game_of_life_compute", "shaders/game_of_life_compute.glsl");
-	
-	shaderManager->setUniform("game_of_life_compute", "textureSize", 600);	
+
+	// TODO: FIX THIS	
+	shaderManager->setUniform("game_of_life_compute", "textureSize", (GLint)this->height*8);	
 	
 	// Set up texture
 	// Create a buffer for the initial state
