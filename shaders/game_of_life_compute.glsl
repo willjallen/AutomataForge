@@ -7,28 +7,46 @@ layout(rgba32f, binding = 0) uniform image2D imgInput;
 layout(rgba32f, binding = 1) uniform image2D imgOutput;
 layout (location = 1) uniform ivec2 textureSize; // textureSize.x is width, textureSize.y is height
 
+shared float cellState[10][10];
+
 void main() {
   ivec2 texelCoord = ivec2(gl_GlobalInvocationID.xy);
 
   // Read current state
-  vec4 current = imageLoad(imgInput, texelCoord);
+  int localX = int(gl_LocalInvocationID.x) + 1;
+  int localY = int(gl_LocalInvocationID.y) + 1;
+  cellState[localX][localY] = imageLoad(imgInput, texelCoord).x;
+
+  // Handle border conditions
+  if (localX == 1) {
+    cellState[localX - 1][localY] = imageLoad(imgInput, ivec2((texelCoord.x - 1 + textureSize.x) % textureSize.x, texelCoord.y)).x;
+  }
+  if (localX == 8) {
+    cellState[localX + 1][localY] = imageLoad(imgInput, ivec2((texelCoord.x + 1) % textureSize.x, texelCoord.y)).x;
+  }
+  if (localY == 1) {
+    cellState[localX][localY - 1] = imageLoad(imgInput, ivec2(texelCoord.x, (texelCoord.y - 1 + textureSize.y) % textureSize.y)).x;
+  }
+  if (localY == 8) {
+    cellState[localX][localY + 1] = imageLoad(imgInput, ivec2(texelCoord.x, (texelCoord.y + 1) % textureSize.y)).x;
+  }
+
+  // Synchronize threads within the work group
+  barrier();
 
   // Count alive neighbors
   int aliveNeighbors = 0;
   for (int dx = -1; dx <= 1; ++dx) {
     for (int dy = -1; dy <= 1; ++dy) {
       if (dx == 0 && dy == 0) continue; // Skip the center cell
-      int neighborX = (texelCoord.x + dx + textureSize.x) % textureSize.x;
-      int neighborY = (texelCoord.y + dy + textureSize.y) % textureSize.y;
-      ivec2 neighborCoord = ivec2(neighborX, neighborY);
-      vec4 neighbor = imageLoad(imgInput, neighborCoord);
-      aliveNeighbors += int(neighbor.x > 0.5);
+      aliveNeighbors += int(cellState[localX + dx][localY + dy] > 0.5);
     }
   }
 
   // Compute next state
-  float nextState = float((aliveNeighbors == 3) || (aliveNeighbors == 2 && current.x > 0.5));
+  float nextState = float((aliveNeighbors == 3) || (aliveNeighbors == 2 && cellState[localX][localY] > 0.5));
 
   // Write next state
   imageStore(imgOutput, texelCoord, vec4(nextState));
 }
+
