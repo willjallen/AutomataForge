@@ -1,6 +1,71 @@
+#include <gl\glew.h>
+#include <SDL_opengl.h>
+#include <gl\glu.h>
+#include <glm\glm.hpp>
+
+#include <memory>
+#include <string>
+
+#include "engine/TextureManager.h"
+#include "engine/ShaderManager.h"
+#include "engine/QuadRenderer.h"
 #include "world/DiffusionLayer.h"
 
-DiffusionLayer::DiffusionLayer(float diffusionRate){
+DiffusionLayer::DiffusionLayer(unsigned int width, 
+							 unsigned int height, 
+                             float diffusionRate,
+							 std::shared_ptr<ShaderManager> shaderManager, 
+							 std::shared_ptr<TextureManager> textureManager, 
+							 std::shared_ptr<QuadRenderer> quadRenderer){
+
+	// Set variables
+	this->width = width;
+	this->height = height;
+
+    this->diffusionRate = diffusionRate;
+
+	this->textureManager = textureManager;
+	this->shaderManager = shaderManager;
+	this->quadRenderer = quadRenderer;
+
+	GLenum error = glGetError();
+	// Set up compute shader
+	shaderManager->loadComputeShader("diffusion_compute", "shaders/diffusion_compute.glsl");
+
+	// TODO: FIX THIS	
+	shaderManager->setUniform("diffusion_compute", "textureSize", glm::ivec2(this->width, this->height));	
+	
+	// Set up texture
+	// Create a buffer for the initial state
+	std::vector<float> initialState(this->width * this->height * 4, 0.0f);
+
+	// Populate the buffer with the initial state
+	for (unsigned int y = 0; y < this->height; y++) { // Use height here
+		for (unsigned int x = 0; x < this->width; x++) { // Use width here
+			int index = (y * this->width + x) * 4;
+			float value = (rand() % 100 < 50) ? 1.0f : 0.0f; // You mentioned a 10% chance, but this line gives a 1% chance
+			// float value = 1.0f;
+			initialState[index] = value; // Red channel (use this for the state)
+			initialState[index + 1] = value; // Green channel
+			initialState[index + 2] = value; // Blue channel
+			initialState[index + 3] = 1.0f; // Alpha channel (always 1)
+		}
+	}
+
+	// Create texture
+	textureManager->createTexture(DIFFUSION_TEXTURE_NAME, this->width, this->height, initialState);
+	
+	// Bind texture to an image unit
+	textureManager->bindImageUnit(DIFFUSION_TEXTURE_NAME);
+	
+	// Bind image unit to compute shader imgOutput
+	textureManager->bindImageUnitToComputeShader(DIFFUSION_TEXTURE_NAME, "diffusion_compute", "imgOutput");
+
+	// Bind texture to a texture unit
+	textureManager->bindTextureUnit(DIFFUSION_TEXTURE_NAME);
+
+	// Bind texture unit to quad renderer shader uniform sampler2D tex
+	textureManager->bindTextureUnitToGeneralShader(DIFFUSION_TEXTURE_NAME, "screen_quad", "tex");
 
 }
 
@@ -13,9 +78,20 @@ void DiffusionLayer::reset(){
 }
 
 void DiffusionLayer::update(){
+	shaderManager->useShader("diffusion_compute");
+	
+	// Divide the dispatch by local workgroup size (10 in this case)
+	glDispatchCompute(this->width / 8, this->height / 8, 1);
 
+	// make sure writing to image has finished before read
+	glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
 }
 
-void DiffusionLayer::render(){
+void DiffusionLayer::render() {
 
+		// render image to quad
+		
+		this->quadRenderer->render();
+		
 }
+

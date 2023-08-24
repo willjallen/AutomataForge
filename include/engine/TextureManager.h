@@ -25,6 +25,14 @@ public:
      */
     ~TextureManager();
 
+
+    /**
+     * @brief Generates a unique texture name. 
+     * @param std::string prefix The prefix for the texture name. Useful for debugging. 
+     * @return std::string The texture name.
+     */
+    std::string generateTextureName(const std::string &prefix);
+
     /**
      * @brief Creates and stores a new texture with given specifications.
      * @param name Name or identifier for the texture.

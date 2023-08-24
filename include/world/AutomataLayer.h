@@ -7,7 +7,8 @@
 #include "engine/ShaderManager.h"
 #include "engine/QuadRenderer.h"
 
-const std::string TEXTURE_NAME = "AUTOMATA_TEXTURE";
+
+const std::string AUTOMATA_TEXTURE_PREFIX = "AUTOMATA";
 
 class AutomataLayer : public Layer{
     public: 
@@ -58,5 +59,10 @@ class AutomataLayer : public Layer{
         std::shared_ptr<TextureManager> textureManager;
         std::shared_ptr<ShaderManager> shaderManager;
         std::shared_ptr<QuadRenderer> quadRenderer;
+
+        // TODO: Multiple input textures
+        std::string inputTexture;
+        std::string outputTexture;
+
 
 };

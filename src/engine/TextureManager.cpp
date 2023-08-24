@@ -5,6 +5,7 @@
 #include <set>
 #include <memory>
 #include <cstdio>
+#include <algorithm>
 #include "engine/Texture.h"
 #include "engine/TextureManager.h"
 
@@ -28,6 +29,19 @@ TextureManager::~TextureManager() {
            // TODO: Handle exception 
         }
     }
+}
+
+
+std::string TextureManager::generateTextureName(const std::string &prefix){
+    auto randchar = []() -> char
+    {
+        const char charset[] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+        const size_t max_index = (sizeof(charset) - 1);
+        return charset[ rand() % max_index ];
+    };
+    std::string str(6,0);
+    std::generate_n(str.begin(), 6, randchar);
+    return std::string(prefix + str);
 }
 
 bool TextureManager::createTexture(const std::string &name, GLsizei width, GLsizei height, std::vector<float>& data) {

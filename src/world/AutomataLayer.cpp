@@ -17,7 +17,7 @@ AutomataLayer::AutomataLayer(unsigned int width,
 							 std::string rewriteRule, 
 							 std::shared_ptr<ShaderManager> shaderManager, 
 							 std::shared_ptr<TextureManager> textureManager, 
-							 std::shared_ptr<QuadRenderer> quadRenderer) : quadRenderer(quadRenderer){
+							 std::shared_ptr<QuadRenderer> quadRenderer){
 
 	// Set variables
 	this->width = width;
@@ -53,20 +53,46 @@ AutomataLayer::AutomataLayer(unsigned int width,
 		}
 	}
 
+	// Create texture one (input/output)
+	// Generate a name
+	std::string textureOneName = textureManager->generateTextureName(AUTOMATA_TEXTURE_PREFIX);
+	
 	// Create texture
-	textureManager->createTexture(TEXTURE_NAME, this->width, this->height, initialState);
+	textureManager->createTexture(textureOneName, this->width, this->height, initialState);
 	
 	// Bind texture to an image unit
-	textureManager->bindImageUnit(TEXTURE_NAME);
-	
-	// Bind image unit to compute shader imgOutput
-	textureManager->bindImageUnitToComputeShader(TEXTURE_NAME, "game_of_life_compute", "imgOutput");
+	textureManager->bindImageUnit(textureOneName);
 
 	// Bind texture to a texture unit
-	textureManager->bindTextureUnit(TEXTURE_NAME);
+	textureManager->bindTextureUnit(textureOneName);
+
+	// Create texture two (input/output)
+	// Generate a name
+	std::string textureTwoName = textureManager->generateTextureName(AUTOMATA_TEXTURE_PREFIX);
+	
+	// Create texture
+	textureManager->createTexture(textureTwoName, this->width, this->height, initialState);
+	
+	// Bind texture to an image unit
+	textureManager->bindImageUnit(textureTwoName);
+
+	// Bind texture to a texture unit
+	textureManager->bindTextureUnit(textureTwoName);
+
+	// Binds for texture one	
+	// Bind image unit to compute shader imgOutput
+	textureManager->bindImageUnitToComputeShader(textureOneName, "game_of_life_compute", "imgInput");
+
+	// Binds for texture two	
+	// Bind image unit to compute shader imgOutput
+	textureManager->bindImageUnitToComputeShader(textureTwoName, "game_of_life_compute", "imgOutput");
+
+	this->inputTexture = textureOneName;
+	this->outputTexture = textureTwoName;
 
 	// Bind texture unit to quad renderer shader uniform sampler2D tex
-	textureManager->bindTextureUnitToGeneralShader(TEXTURE_NAME, "screen_quad", "tex");
+	// textureManager->bindTextureUnitToGeneralShader(textureTwoName, "screen_quad", "tex");
+
 
 }
 
@@ -79,6 +105,13 @@ void AutomataLayer::reset(){
 }
 
 void AutomataLayer::update(){
+	// Swap input and output texture
+	std::string swap = this->inputTexture;
+	this->inputTexture = outputTexture;
+	this->outputTexture = inputTexture;
+	textureManager->bindImageUnitToComputeShader(this->inputTexture, "game_of_life_compute", "imgInput");
+	textureManager->bindImageUnitToComputeShader(this->outputTexture, "game_of_life_compute", "imgOutput");
+
 	shaderManager->useShader("game_of_life_compute");
 	
 	// Divide the dispatch by local workgroup size (10 in this case)
@@ -90,8 +123,10 @@ void AutomataLayer::update(){
 
 void AutomataLayer::render() {
 
-		// render image to quad
-		
+		// Bind output texture
+		textureManager->bindTextureUnitToGeneralShader(this->outputTexture, "screen_quad", "tex");
+
+		// Render image to quad
 		this->quadRenderer->render();
 		
 }
