@@ -105,10 +105,7 @@ void AutomataLayer::reset(){
 }
 
 void AutomataLayer::update(){
-	// Swap input and output texture
-	std::string swap = this->inputTexture;
-	this->inputTexture = outputTexture;
-	this->outputTexture = inputTexture;
+
 	textureManager->bindImageUnitToComputeShader(this->inputTexture, "game_of_life_compute", "imgInput");
 	textureManager->bindImageUnitToComputeShader(this->outputTexture, "game_of_life_compute", "imgOutput");
 
@@ -123,12 +120,17 @@ void AutomataLayer::update(){
 
 void AutomataLayer::render() {
 
-		// Bind output texture
-		// TODO: I might be skipping frames here	
-		textureManager->bindTextureUnitToGeneralShader(this->outputTexture, "screen_quad", "tex");
+	// Bind output texture
+	// TODO: I might be skipping frames here	
+	textureManager->bindTextureUnitToGeneralShader(this->outputTexture, "screen_quad", "tex");
 
-		// Render image to quad
-		this->quadRenderer->render();
-		
+	// Render image to quad
+	this->quadRenderer->render();
+
+	// Swap input and output texture
+	std::string swap = this->inputTexture;
+	this->inputTexture = outputTexture;
+	this->outputTexture = swap;
+	
 }
 
