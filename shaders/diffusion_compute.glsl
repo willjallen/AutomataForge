@@ -13,7 +13,6 @@ void main() {
     ivec2 gridCoord = ivec2(gl_GlobalInvocationID.xy);
 
     // Check for boundary conditions
-    if (gridCoord.x > 0 && gridCoord.x < gridSize.y - 1 && gridCoord.y > 0 && gridCoord.y < gridSize.x - 1) {
         // Load current state
         float currentState = imageLoad(inputGrid, gridCoord).r;
 
@@ -34,5 +33,5 @@ void main() {
 
         // Store the updated state in the red channel of the output image
         imageStore(outputGrid, gridCoord, vec4(newState, 0.0, 0.0, 1.0));
-    }
+    
 }

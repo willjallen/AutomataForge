@@ -33,8 +33,8 @@ DiffusionLayer::DiffusionLayer(unsigned int width,
 	shaderManager->loadComputeShader("diffusion_compute", "shaders/diffusion_compute.glsl");
 
 	
-	shaderManager->setUniform("diffusion_compute", "gridSize", glm::ivec2(this->width, this->height));	
-	shaderManager->setUniform("diffusion_compute", "diffusionCoefficient", 0.01f);	
+	// shaderManager->setUniform("diffusion_compute", "gridSize", glm::ivec2(this->width, this->height));	
+	shaderManager->setUniform("diffusion_compute", "diffusionCoefficient", 0.1f);	
 	// Set up texture
 	// Create a buffer for the initial state
 	std::vector<float> initialState(this->width * this->height * 4, 0.0f);
@@ -45,9 +45,9 @@ DiffusionLayer::DiffusionLayer(unsigned int width,
 			float sourceValue = 0.0f;
 			float sourcePresent = (rand() % 100 < 1) ? 1.0f : 0.0f; // 1% chance of being source or sink
 			if(sourcePresent == 1.0f){
-				sourceValue = (rand() % 100 < 50) ? 1.0f : 0.0f; //50% chance of being either a source or sink
+				sourceValue = (rand() % 100 < 50) ? 1.0f : -1.0f; //50% chance of being either a source or sink
 			}
-			initialState[index] = sourceValue * 100; // Red channel (use this for the state)
+			initialState[index] = sourceValue * 10000; // Red channel (use this for the state)
 			initialState[index + 1] = 0.0f; // Green channel
 			initialState[index + 2] = 0.0f; // Blue channel
 			initialState[index + 3] = 1.0f; // Alpha channel (always 1)
@@ -90,21 +90,21 @@ DiffusionLayer::DiffusionLayer(unsigned int width,
 	std::string sourcesTextureName = textureManager->generateTextureName(DIFFUSION_TEXTURE_NAME);
 	
 	// Create texture
-	textureManager->createTexture(sourcesTextureName, this->width, this->height, initialState);
+	// textureManager->createTexture(sourcesTextureName, this->width, this->height, initialState);
 	
 	// Bind texture to an image unit
-	textureManager->bindImageUnit(sourcesTextureName);
+	// textureManager->bindImageUnit(sourcesTextureName);
 
 	// Bind texture to a texture unit
 	// textureManager->bindTextureUnit(sourcesTextureName);
 
 	// Binds for texture one	
 	// Bind image unit to compute shader imgInput
-	textureManager->bindImageUnitToComputeShader(textureOneName, "diffusion_compute", "inputGrid");
+	// textureManager->bindImageUnitToComputeShader(textureOneName, "diffusion_compute", "inputGrid");
 
 	// Binds for texture two	
 	// Bind image unit to compute shader imgOutput
-	textureManager->bindImageUnitToComputeShader(textureTwoName, "diffusion_compute", "outputGrid");
+	// textureManager->bindImageUnitToComputeShader(textureTwoName, "diffusion_compute", "outputGrid");
 
 	// Binds for sources texture
 	// Bind image unit to compute shader imgSources
@@ -128,10 +128,7 @@ void DiffusionLayer::reset(){
 }
 
 void DiffusionLayer::update(){
-	// Swap input and output texture
-	std::string swap = this->inputTexture;
-	this->inputTexture = outputTexture;
-	this->outputTexture = swap;
+
 	textureManager->bindImageUnitToComputeShader(this->inputTexture, "diffusion_compute", "inputGrid");
 	textureManager->bindImageUnitToComputeShader(this->outputTexture, "diffusion_compute", "outputGrid");
 	// textureManager->bindImageUnitToComputeShader(this->sourcesTexture, "diffusion_compute", "imgSources");
@@ -152,6 +149,11 @@ void DiffusionLayer::render() {
 
 		// Render image to quad
 		this->quadRenderer->render();
+
+		// Swap input and output texture
+		std::string swap = this->inputTexture;
+		this->inputTexture = outputTexture;
+		this->outputTexture = swap;
 		
 }
 
