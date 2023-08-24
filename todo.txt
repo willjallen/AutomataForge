@@ -19,3 +19,42 @@ cmake should rebuild SDL for debug builds
 
 Setting the wrong uniform datatype (i.e unsigned int to an int) is a problem. Should probably 
 define a static map of constants for that somewhere
+
+http://hplgit.github.io/fdm-book/doc/pub/diffu/html/._diffu-solarized001.html
+====
+I want to have a single string that determines the rewrite rule for the entire system
+https://conwaylife.com/wiki/Rulestring
+
+Simple case: Game of life
+The most common notation for rulestrings 
+
+B{number list}/S{number list}; 
+
+this is referred to as the birth/survival notation, and is sometimes called 
+the rulestring of the CA in question. B (for birth) is a list of all the numbers 
+of live neighbors that cause a dead cell to come alive (be born); S (for survival)
+is a list of all the numbers of live neighbors that cause a live cell to remain 
+alive (survive).
+
+The rulestring of Conway's Game of Life is B3/S23.
+
+More complicated case: Larger than Life
+
+Rr,Cc,Ssranges,Bbranges,Nn
+
+Here:
+- Rr specifies the range (r is from 1 to 500 in Golly and LifeViewer; 1 to 10 in MCell).
+- Cc specifies the number of states (c is from 0 to 255 in Golly and LifeViewer)
+- Ss specifies the survival conditions, which are numbers separated by commas. Ranges of 
+consecutive numbers can be contracted via dashes; e.g. S6,7,8,13,14,18 can be expressed as S6-8,13-14,18
+- Bb specifies the birth conditions, which are numbers separated by commas. Ranges of consecutive numbers 
+can be contracted via dashes; e.g. B6,7,8,13,14,18 can be expressed as B6-8,13-14,18
+- Nn specifies the extended neighborhood type (n is M for Moore or N for von Neumann. 
+Golly and LifeViewer also support C for Circular neighborhood. LifeViewer additionally 
+supports 2 for L2, + for Cross, X for Saltire and * for Star neighborhoods and many more). 
+For Moore, this parameter is omitted.
+
+My case:
+Automata Layer:
+- Considers 3x3 grid neighbors, optionally the middle cell
+- 

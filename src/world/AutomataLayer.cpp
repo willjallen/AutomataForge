@@ -44,7 +44,7 @@ AutomataLayer::AutomataLayer(unsigned int width,
 	for (unsigned int y = 0; y < this->height; y++) { // Use height here
 		for (unsigned int x = 0; x < this->width; x++) { // Use width here
 			int index = (y * this->width + x) * 4;
-			float value = (rand() % 100 < 50) ? 1.0f : 0.0f; // You mentioned a 10% chance, but this line gives a 1% chance
+			float value = (rand() % 100 < 50) ? 1.0f : 0.0f; // 50% chance
 			// float value = 1.0f;
 			initialState[index] = value; // Red channel (use this for the state)
 			initialState[index + 1] = value; // Green channel
@@ -124,6 +124,7 @@ void AutomataLayer::update(){
 void AutomataLayer::render() {
 
 		// Bind output texture
+		// TODO: I might be skipping frames here	
 		textureManager->bindTextureUnitToGeneralShader(this->outputTexture, "screen_quad", "tex");
 
 		// Render image to quad

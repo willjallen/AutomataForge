@@ -2,6 +2,7 @@
 
 #include "world/World.h"
 #include "world/AutomataLayer.h"
+#include "world/DiffusionLayer.h"
 #include "engine/TextureManager.h"
 #include "engine/ShaderManager.h"
 
@@ -19,14 +20,23 @@ World::World(unsigned int width,
     this->quadRenderer = std::make_shared<QuadRenderer>(this->shaderManager);
 
     // Set up layers
+
     this->layers.push_back(
-        std::make_shared<AutomataLayer>(this->width, 
+        std::make_shared<DiffusionLayer>(this->width, 
                                         this->height, 
-                                        (unsigned int)1,
-                                        std::string(""), 
+                                        0.1f,
                                         this->shaderManager, 
                                         this->textureManager, 
                                         this->quadRenderer));
+
+    // this->layers.push_back(
+    //     std::make_shared<AutomataLayer>(this->width, 
+    //                                     this->height, 
+    //                                     (unsigned int)1,
+    //                                     std::string(""), 
+    //                                     this->shaderManager, 
+    //                                     this->textureManager, 
+    //                                     this->quadRenderer));
 
 }
 

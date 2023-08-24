@@ -7,6 +7,7 @@ layout(rgba32f, binding = 0) uniform image2D imgInput;
 layout(rgba32f, binding = 1) uniform image2D imgOutput;
 layout (location = 1) uniform ivec2 textureSize; // textureSize.x is width, textureSize.y is height
 
+// width,height+2 for borders
 shared float cellState[10][10];
 
 void main() {

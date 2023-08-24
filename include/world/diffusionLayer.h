@@ -50,5 +50,8 @@ class DiffusionLayer : public Layer{
         std::shared_ptr<ShaderManager> shaderManager;
         std::shared_ptr<TextureManager> textureManager;
         std::shared_ptr<QuadRenderer> quadRenderer;
-
+        
+        std::string inputTexture;
+        std::string outputTexture;
+        std::string sourcesTexture;
 };
