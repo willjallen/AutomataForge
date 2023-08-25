@@ -24,19 +24,19 @@ World::World(unsigned int width,
     this->layers.push_back(
         std::make_shared<DiffusionLayer>(this->width, 
                                         this->height, 
-                                        0.1f,
+                                        1.0f,
+                                        this->shaderManager, 
+                                        this->textureManager, 
+                                        this->quadRenderer));
+    this->layers.push_back(
+        std::make_shared<AutomataLayer>(this->width, 
+                                        this->height, 
+                                        (unsigned int)1,
+                                        std::string(""), 
                                         this->shaderManager, 
                                         this->textureManager, 
                                         this->quadRenderer));
 
-    // this->layers.push_back(
-    //     std::make_shared<AutomataLayer>(this->width, 
-    //                                     this->height, 
-    //                                     (unsigned int)1,
-    //                                     std::string(""), 
-    //                                     this->shaderManager, 
-    //                                     this->textureManager, 
-    //                                     this->quadRenderer));
 
 }
 

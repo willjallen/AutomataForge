@@ -7,7 +7,7 @@ Engine::Engine(){
 
     // Construct the window
 	this->window = std::make_unique<Window>("AutomataForge", WINDOW_WIDTH, WINDOW_HEIGHT);
-
+	
 	// Start shader manager
 	this->shaderManager = std::make_shared<ShaderManager>();
 

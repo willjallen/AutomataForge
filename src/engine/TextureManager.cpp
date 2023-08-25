@@ -16,7 +16,7 @@ TextureManager::TextureManager(std::shared_ptr<ShaderManager> shaderManager) {
     // Query hardware limits
     glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &this->maxTextureImageUnits);
     glGetIntegerv(GL_MAX_IMAGE_UNITS, &this->maxImageUnits);
-    printf("Max texture image units:%d", this->maxTextureImageUnits);
+    printf("Max texture image units:%d", this->maxTextureImageUnits - 1); // -1 for the reset at index 0
     printf("Max texture image units:%d", this->maxImageUnits);
 }
 
@@ -113,7 +113,8 @@ GLuint TextureManager::getNextAvailableTextureUnit() {
     }
 
     // Find the smallest available texture unit
-    for (GLint i = 0; i < this->maxTextureImageUnits; ++i) {
+    // (add 1 to skip over reset texture)
+    for (GLint i = 1; i < this->maxTextureImageUnits; ++i) {
         if (usedTextureUnits.find(i) == usedTextureUnits.end()) {
             return i; // Return the first unused texture unit
         }
@@ -154,14 +155,19 @@ void TextureManager::bindTextureUnit(const std::string &name) {
     // Get the next available texture unit
     GLuint textureUnit = getNextAvailableTextureUnit();
 
-    // Store the texture unit in the map
+    // Store the texture unit in the map 
     textureUnits[name] = textureUnit;
 
-    // Activate the selected texture unit
+    // Activate the selected texture unit 
     glActiveTexture(GL_TEXTURE0 + textureUnit);
 
+    GLenum error = glGetError();
     // Bind the texture to the active texture unit
     glBindTexture(GL_TEXTURE_2D, texture->getTextureID());
+    error = glGetError();
+
+    // Unbind active texture
+    glActiveTexture(GL_TEXTURE0);
 }
 
 void TextureManager::bindImageUnit(const std::string &name) {
@@ -181,7 +187,7 @@ void TextureManager::bindImageUnit(const std::string &name) {
     // Bind the texture to the selected image unit
     glBindImageTexture(imageUnit, texture->getTextureID(), 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA32F);
     error = glGetError();
-    error = glGetError();
+
 
 }
 // https://computergraphics.stackexchange.com/questions/10066/get-binding-point-of-sampler-image-in-shader

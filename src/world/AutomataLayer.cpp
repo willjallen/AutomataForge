@@ -33,7 +33,6 @@ AutomataLayer::AutomataLayer(unsigned int width,
 	// Set up compute shader
 	shaderManager->loadComputeShader("game_of_life_compute", "shaders/game_of_life_compute.glsl");
 
-	// TODO: FIX THIS	
 	shaderManager->setUniform("game_of_life_compute", "textureSize", glm::ivec2(this->width, this->height));	
 	
 	// Set up texture
@@ -49,7 +48,7 @@ AutomataLayer::AutomataLayer(unsigned int width,
 			initialState[index] = value; // Red channel (use this for the state)
 			initialState[index + 1] = value; // Green channel
 			initialState[index + 2] = value; // Blue channel
-			initialState[index + 3] = 1.0f; // Alpha channel (always 1)
+			initialState[index + 3] = 0.5f; // Alpha channel (always 1)
 		}
 	}
 
@@ -111,7 +110,7 @@ void AutomataLayer::update(){
 
 	shaderManager->useShader("game_of_life_compute");
 	
-	// Divide the dispatch by local workgroup size (10 in this case)
+	// Divide the dispatch by local workgroup size 
 	glDispatchCompute(this->width / 8, this->height / 8, 1);
 
 	// make sure writing to image has finished before read
@@ -121,8 +120,7 @@ void AutomataLayer::update(){
 void AutomataLayer::render() {
 
 	// Bind output texture
-	// TODO: I might be skipping frames here	
-	textureManager->bindTextureUnitToGeneralShader(this->outputTexture, "screen_quad", "tex");
+	textureManager->bindTextureUnitToGeneralShader(this->inputTexture, "screen_quad", "tex");
 
 	// Render image to quad
 	this->quadRenderer->render();

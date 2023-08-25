@@ -31,7 +31,12 @@ DiffusionLayer::DiffusionLayer(unsigned int width,
 	GLenum error = glGetError();
 	// Set up compute shader
 	shaderManager->loadComputeShader("diffusion_compute", "shaders/diffusion_compute.glsl");
+// alpha = 2.0
+// delta_x = 1
 
+// # Calculated params
+// delta_t = (delta_x ** 2)/(4 * alpha)
+// gamma = (alpha * delta_t) / (delta_x ** 2)
 	
 	// shaderManager->setUniform("diffusion_compute", "gridSize", glm::ivec2(this->width, this->height));	
 	shaderManager->setUniform("diffusion_compute", "diffusionCoefficient", 0.1f);	
@@ -50,13 +55,13 @@ DiffusionLayer::DiffusionLayer(unsigned int width,
 			initialState[index] = sourceValue * 10000; // Red channel (use this for the state)
 			initialState[index + 1] = 0.0f; // Green channel
 			initialState[index + 2] = 0.0f; // Blue channel
-			initialState[index + 3] = 1.0f; // Alpha channel (always 1)
+			initialState[index + 3] = 0.5f; // Alpha channel (always 1)
 		}
 	}
 
 	// Create texture one (input/output)
 	// Generate a name
-	std::string textureOneName = textureManager->generateTextureName(DIFFUSION_TEXTURE_NAME);
+	std::string textureOneName = textureManager->generateTextureName(DIFFUSION_TEXTURE_PREFIX);
 	
 	// Create texture
 	textureManager->createTexture(textureOneName, this->width, this->height, initialState);
@@ -69,7 +74,7 @@ DiffusionLayer::DiffusionLayer(unsigned int width,
 
 	// Create texture two (input/output)
 	// Generate a name
-	std::string textureTwoName = textureManager->generateTextureName(DIFFUSION_TEXTURE_NAME);
+	std::string textureTwoName = textureManager->generateTextureName(DIFFUSION_TEXTURE_PREFIX);
 	
 	// Create texture
 	textureManager->createTexture(textureTwoName, this->width, this->height, initialState);
@@ -82,37 +87,35 @@ DiffusionLayer::DiffusionLayer(unsigned int width,
 	
 	// Create sources(/sinks) texture
 
-
-
-
-
 	// Generate a name
-	std::string sourcesTextureName = textureManager->generateTextureName(DIFFUSION_TEXTURE_NAME);
+	// std::string sourcesTextureName = textureManager->generateTextureName(DIFFUSION_TEXTURE_PREFIX);
 	
-	// Create texture
+	// // Create texture
 	// textureManager->createTexture(sourcesTextureName, this->width, this->height, initialState);
 	
-	// Bind texture to an image unit
+	// // Bind texture to an image unit
 	// textureManager->bindImageUnit(sourcesTextureName);
 
-	// Bind texture to a texture unit
+	// // Bind texture to a texture unit
 	// textureManager->bindTextureUnit(sourcesTextureName);
 
 	// Binds for texture one	
 	// Bind image unit to compute shader imgInput
-	// textureManager->bindImageUnitToComputeShader(textureOneName, "diffusion_compute", "inputGrid");
+	textureManager->bindImageUnitToComputeShader(textureOneName, "diffusion_compute", "inputGrid");
 
 	// Binds for texture two	
 	// Bind image unit to compute shader imgOutput
-	// textureManager->bindImageUnitToComputeShader(textureTwoName, "diffusion_compute", "outputGrid");
+	textureManager->bindImageUnitToComputeShader(textureTwoName, "diffusion_compute", "outputGrid");
 
 	// Binds for sources texture
 	// Bind image unit to compute shader imgSources
 	// textureManager->bindImageUnitToComputeShader(sourcesTextureName, "diffusion_compute", "imgSources");
-	
+
 	this->inputTexture = textureOneName;
 	this->outputTexture = textureTwoName;
-	this->sourcesTexture = sourcesTextureName;
+	// this->sourcesTexture = sourcesTextureName;
+	textureManager->bindImageUnitToComputeShader(this->inputTexture, "diffusion_compute", "inputGrid");
+	textureManager->bindImageUnitToComputeShader(this->outputTexture, "diffusion_compute", "outputGrid");
 
 	// Bind texture unit to quad renderer shader uniform sampler2D tex
 	// textureManager->bindTextureUnitToGeneralShader(textureTwoName, "screen_quad", "tex");

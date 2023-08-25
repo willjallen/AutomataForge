@@ -3,10 +3,10 @@
 layout (local_size_x = 8, local_size_y = 8, local_size_z = 1) in;
 
 // Uniforms
-layout(rgba32f, binding = 0) uniform image2D inputGrid;    // Current state of the grid (u)
-layout(rgba32f, binding = 1) uniform image2D outputGrid;   // Updated state of the grid (u_new)
-layout(rgba32f, binding = 2) uniform image2D sourceGrid;   // Source term at each grid point (s_{i,j})
-layout (location = 1) uniform ivec2 gridSize; // gridSize.x is width (n), gridSize.y is height (m)
+layout(rgba32f, binding = 3) uniform image2D inputGrid;    // Current state of the grid (u)
+layout(rgba32f, binding = 4) uniform image2D outputGrid;   // Updated state of the grid (u_new)
+layout(rgba32f, binding = 5) uniform image2D sourceGrid;   // Source term at each grid point (s_{i,j})
+// layout (location = 1) uniform ivec2 gridSize; // gridSize.x is width (n), gridSize.y is height (m)
 layout (location = 2) uniform float diffusionCoefficient; // Diffusion coefficient
 
 void main() {

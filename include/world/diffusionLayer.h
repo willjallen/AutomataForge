@@ -3,7 +3,7 @@
 #include "Layer.h"
 
 // TODO: This doesn't work for multiple diffusion layers
-const std::string DIFFUSION_TEXTURE_NAME = "DIFFUSION_TEXTURE";
+const std::string DIFFUSION_TEXTURE_PREFIX = "DIFFUSION";
 
 class DiffusionLayer : public Layer{
     public: 
