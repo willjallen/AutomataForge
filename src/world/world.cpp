@@ -21,21 +21,27 @@ World::World(unsigned int width,
 
     // Set up layers
 
-    this->layers.push_back(
+    std::shared_ptr<DiffusionLayer> diffusionLayer = 
         std::make_shared<DiffusionLayer>(this->width, 
                                         this->height, 
                                         1.0f,
                                         this->shaderManager, 
                                         this->textureManager, 
-                                        this->quadRenderer));
-    this->layers.push_back(
+                                        this->quadRenderer);
+
+    std::shared_ptr<AutomataLayer> automataLayer = 
         std::make_shared<AutomataLayer>(this->width, 
                                         this->height, 
                                         (unsigned int)1,
                                         std::string(""), 
                                         this->shaderManager, 
                                         this->textureManager, 
-                                        this->quadRenderer));
+                                        this->quadRenderer,
+                                        diffusionLayer);
+    
+    this->layers.push_back(diffusionLayer);
+    this->layers.push_back(automataLayer);
+
 
 
 }

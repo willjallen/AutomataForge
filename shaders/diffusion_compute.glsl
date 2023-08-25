@@ -26,10 +26,10 @@ void main() {
         );
 
         // Load source term
-        // float sourceTerm = imageLoad(sourceGrid, gridCoord).r;
+        float sourceTerm = imageLoad(sourceGrid, gridCoord).r;
 
         // Update the state
-        float newState = currentState + diffusion; // + sourceTerm;
+        float newState = currentState + diffusion + sourceTerm;
 
         // Store the updated state in the red channel of the output image
         imageStore(outputGrid, gridCoord, vec4(newState, 0.0, 0.0, 1.0));

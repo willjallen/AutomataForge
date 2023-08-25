@@ -50,4 +50,3 @@ void main() {
   // Write next state
   imageStore(imgOutput, texelCoord, vec4(nextState));
 }
-

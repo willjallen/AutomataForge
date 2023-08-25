@@ -31,15 +31,22 @@ DiffusionLayer::DiffusionLayer(unsigned int width,
 	GLenum error = glGetError();
 	// Set up compute shader
 	shaderManager->loadComputeShader("diffusion_compute", "shaders/diffusion_compute.glsl");
-// alpha = 2.0
-// delta_x = 1
 
-// # Calculated params
-// delta_t = (delta_x ** 2)/(4 * alpha)
-// gamma = (alpha * delta_t) / (delta_x ** 2)
+	// Set up heatmap shader for rendering
+	shaderManager->loadShader("heatmap_quad", "shaders/heatmap_quad_vertex.glsl", "shaders/heatmap_quad_fragment.glsl");
+	shaderManager->setUniform("heatmap_quad", "minValue", 0.0f);
+	shaderManager->setUniform("heatmap_quad", "maxValue", 40.0f);
+
+
+	// alpha = 2.0
+	// delta_x = 1
+
+	// # Calculated params
+	// delta_t = (delta_x ** 2)/(4 * alpha)
+	// gamma = (alpha * delta_t) / (delta_x ** 2)
 	
 	// shaderManager->setUniform("diffusion_compute", "gridSize", glm::ivec2(this->width, this->height));	
-	shaderManager->setUniform("diffusion_compute", "diffusionCoefficient", 0.1f);	
+	shaderManager->setUniform("diffusion_compute", "diffusionCoefficient", 0.2f);	
 	// Set up texture
 	// Create a buffer for the initial state
 	std::vector<float> initialState(this->width * this->height * 4, 0.0f);
@@ -48,14 +55,14 @@ DiffusionLayer::DiffusionLayer(unsigned int width,
 		for (unsigned int x = 0; x < this->width; x++) { // Use width here
 			int index = (y * this->width + x) * 4;
 			float sourceValue = 0.0f;
-			float sourcePresent = (rand() % 100 < 1) ? 1.0f : 0.0f; // 1% chance of being source or sink
+			float sourcePresent = (rand() % 1000 < 1) ? 1.0f : 0.0f; // 0.1% chance of being source or sink
 			if(sourcePresent == 1.0f){
-				sourceValue = (rand() % 100 < 50) ? 1.0f : -1.0f; //50% chance of being either a source or sink
+				sourceValue = (rand() % 100 < 50) ? 1.0f : 0.0f; //50% chance of being either a source or sink
 			}
-			initialState[index] = sourceValue * 10000; // Red channel (use this for the state)
+			initialState[index] = sourceValue * 0; // Red channel (use this for the state)
 			initialState[index + 1] = 0.0f; // Green channel
 			initialState[index + 2] = 0.0f; // Blue channel
-			initialState[index + 3] = 0.5f; // Alpha channel (always 1)
+			initialState[index + 3] = 1.0f; // Alpha channel (always 1)
 		}
 	}
 
@@ -64,7 +71,7 @@ DiffusionLayer::DiffusionLayer(unsigned int width,
 	std::string textureOneName = textureManager->generateTextureName(DIFFUSION_TEXTURE_PREFIX);
 	
 	// Create texture
-	textureManager->createTexture(textureOneName, this->width, this->height, initialState);
+	textureManager->createTexture(textureOneName, this->width, this->height, std::vector<float>(this->width * this->height * 4, 0.0f));
 	
 	// Bind texture to an image unit
 	textureManager->bindImageUnit(textureOneName);
@@ -77,7 +84,7 @@ DiffusionLayer::DiffusionLayer(unsigned int width,
 	std::string textureTwoName = textureManager->generateTextureName(DIFFUSION_TEXTURE_PREFIX);
 	
 	// Create texture
-	textureManager->createTexture(textureTwoName, this->width, this->height, initialState);
+	textureManager->createTexture(textureTwoName, this->width, this->height, std::vector<float>(this->width * this->height * 4, 0.0f));
 	
 	// Bind texture to an image unit
 	textureManager->bindImageUnit(textureTwoName);
@@ -88,16 +95,16 @@ DiffusionLayer::DiffusionLayer(unsigned int width,
 	// Create sources(/sinks) texture
 
 	// Generate a name
-	// std::string sourcesTextureName = textureManager->generateTextureName(DIFFUSION_TEXTURE_PREFIX);
+	std::string sourcesTextureName = textureManager->generateTextureName(DIFFUSION_TEXTURE_PREFIX);
 	
 	// // Create texture
-	// textureManager->createTexture(sourcesTextureName, this->width, this->height, initialState);
+	textureManager->createTexture(sourcesTextureName, this->width, this->height, initialState);
 	
 	// // Bind texture to an image unit
-	// textureManager->bindImageUnit(sourcesTextureName);
+	textureManager->bindImageUnit(sourcesTextureName);
 
 	// // Bind texture to a texture unit
-	// textureManager->bindTextureUnit(sourcesTextureName);
+	textureManager->bindTextureUnit(sourcesTextureName);
 
 	// Binds for texture one	
 	// Bind image unit to compute shader imgInput
@@ -109,11 +116,11 @@ DiffusionLayer::DiffusionLayer(unsigned int width,
 
 	// Binds for sources texture
 	// Bind image unit to compute shader imgSources
-	// textureManager->bindImageUnitToComputeShader(sourcesTextureName, "diffusion_compute", "imgSources");
+	textureManager->bindImageUnitToComputeShader(sourcesTextureName, "diffusion_compute", "sourceGrid");
 
 	this->inputTexture = textureOneName;
 	this->outputTexture = textureTwoName;
-	// this->sourcesTexture = sourcesTextureName;
+	this->sourcesTexture = sourcesTextureName;
 	textureManager->bindImageUnitToComputeShader(this->inputTexture, "diffusion_compute", "inputGrid");
 	textureManager->bindImageUnitToComputeShader(this->outputTexture, "diffusion_compute", "outputGrid");
 
@@ -126,6 +133,10 @@ DiffusionLayer::~DiffusionLayer(){
 
 }
 
+std::string DiffusionLayer::getOutputTexture(){
+	return this->outputTexture;
+}
+
 void DiffusionLayer::reset(){
 
 }
@@ -134,7 +145,7 @@ void DiffusionLayer::update(){
 
 	textureManager->bindImageUnitToComputeShader(this->inputTexture, "diffusion_compute", "inputGrid");
 	textureManager->bindImageUnitToComputeShader(this->outputTexture, "diffusion_compute", "outputGrid");
-	// textureManager->bindImageUnitToComputeShader(this->sourcesTexture, "diffusion_compute", "imgSources");
+	textureManager->bindImageUnitToComputeShader(this->sourcesTexture, "diffusion_compute", "sourceGrid");
 	
 	shaderManager->useShader("diffusion_compute");
 	
@@ -148,10 +159,12 @@ void DiffusionLayer::update(){
 void DiffusionLayer::render() {
 
 		// Bind output texture
-		textureManager->bindTextureUnitToGeneralShader(this->outputTexture, "screen_quad", "tex");
+		textureManager->bindTextureUnitToGeneralShader(this->outputTexture, "heatmap_quad", "tex");
+
+		shaderManager->useShader("heatmap_quad");
 
 		// Render image to quad
-		this->quadRenderer->render();
+		quadRenderer->render();
 
 		// Swap input and output texture
 		std::string swap = this->inputTexture;

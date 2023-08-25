@@ -7,9 +7,7 @@ QuadRenderer::QuadRenderer(std::shared_ptr<ShaderManager> shaderManager) {
     // Set up variables
     this->shaderManager = shaderManager;
 
-    // Set up shader
-	shaderManager->loadShader("screen_quad", "shaders/screen_quad_vertex.glsl", "shaders/screen_quad_fragment.glsl");
-    
+
     // Quad vertices representing positions and texture coordinates
     float quadVertices[] = {
         // positions        // texture Coords
@@ -42,7 +40,6 @@ QuadRenderer::QuadRenderer(std::shared_ptr<ShaderManager> shaderManager) {
 
 void QuadRenderer::render() {
 
-    this->shaderManager->useShader("screen_quad");
 
     // Bind the VAO containing the quad's vertex attributes
     glBindVertexArray(this->quadVAO);

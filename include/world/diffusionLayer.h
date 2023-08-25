@@ -27,6 +27,27 @@ class DiffusionLayer : public Layer{
          */
         ~DiffusionLayer();
 
+        // /**
+        //  * @brief Add a temporary source (or sink) to the diffusion layer. Lasts for one update only.
+        //  * 
+        //  * @param gridX x coordinate of the source/sink
+        //  * @param gridY y coordinate of the source/sink
+        //  * @param sourceValue The value of the source/sink
+        //  */
+        // void addTemporarySource(unsigned int gridX, unsigned int gridY, float sourceValue);
+
+
+        /**
+         * @brief Add a permanent source (or sink) to the diffusion layer. Lasts until removed.
+         * 
+         * @param gridX x coordinate of the source/sink
+         * @param gridY y coordinate of the source/sink
+         * @param sourceValue The value of the source/sink
+         */
+        void addPermanentSource(unsigned int gridX, unsigned int gridY, float sourceValue);
+
+        std::string getOutputTexture();
+
         /**
          * @brief Reset the diffusion layer 
          * 

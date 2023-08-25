@@ -3,6 +3,7 @@
 #include <string>
 #include <memory>
 #include "Layer.h"
+#include "world/DiffusionLayer.h"
 #include "engine/TextureManager.h"
 #include "engine/ShaderManager.h"
 #include "engine/QuadRenderer.h"
@@ -26,7 +27,8 @@ class AutomataLayer : public Layer{
                         std::string rewriteRule, 
                         std::shared_ptr<ShaderManager> shaderManager,
                         std::shared_ptr<TextureManager> textureManager,
-                        std::shared_ptr<QuadRenderer> quadRenderer);
+                        std::shared_ptr<QuadRenderer> quadRenderer,
+                        std::shared_ptr<DiffusionLayer> diffusionLayer);
         /**
          * @brief Destroy the Automata Layer object
          * 
@@ -59,6 +61,7 @@ class AutomataLayer : public Layer{
         std::shared_ptr<TextureManager> textureManager;
         std::shared_ptr<ShaderManager> shaderManager;
         std::shared_ptr<QuadRenderer> quadRenderer;
+        std::shared_ptr<DiffusionLayer> diffusionLayer;
 
         // TODO: Multiple input textures
         std::string inputTexture;
