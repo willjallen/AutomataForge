@@ -35,7 +35,7 @@ DiffusionLayer::DiffusionLayer(unsigned int width,
 	// Set up heatmap shader for rendering
 	shaderManager->loadShader("heatmap_quad", "shaders/heatmap_quad_vertex.glsl", "shaders/heatmap_quad_fragment.glsl");
 	shaderManager->setUniform("heatmap_quad", "minValue", 0.0f);
-	shaderManager->setUniform("heatmap_quad", "maxValue", 40.0f);
+	shaderManager->setUniform("heatmap_quad", "maxValue", 20.0f);
 
 
 	// alpha = 2.0
@@ -46,7 +46,7 @@ DiffusionLayer::DiffusionLayer(unsigned int width,
 	// gamma = (alpha * delta_t) / (delta_x ** 2)
 	
 	// shaderManager->setUniform("diffusion_compute", "gridSize", glm::ivec2(this->width, this->height));	
-	shaderManager->setUniform("diffusion_compute", "diffusionCoefficient", 0.2f);	
+	shaderManager->setUniform("diffusion_compute", "diffusionCoefficient", 0.15f);	
 	// Set up texture
 	// Create a buffer for the initial state
 	std::vector<float> initialState(this->width * this->height * 4, 0.0f);
@@ -55,11 +55,11 @@ DiffusionLayer::DiffusionLayer(unsigned int width,
 		for (unsigned int x = 0; x < this->width; x++) { // Use width here
 			int index = (y * this->width + x) * 4;
 			float sourceValue = 0.0f;
-			float sourcePresent = (rand() % 1000 < 1) ? 1.0f : 0.0f; // 0.1% chance of being source or sink
+			float sourcePresent = (rand() % 100000 < 1) ? 1.0f : 0.0f; // 0.1% chance of being source or sink
 			if(sourcePresent == 1.0f){
 				sourceValue = (rand() % 100 < 50) ? 1.0f : 0.0f; //50% chance of being either a source or sink
 			}
-			initialState[index] = sourceValue * 0; // Red channel (use this for the state)
+			initialState[index] = sourceValue * 20; // Red channel (use this for the state)
 			initialState[index + 1] = 0.0f; // Green channel
 			initialState[index + 2] = 0.0f; // Blue channel
 			initialState[index + 3] = 1.0f; // Alpha channel (always 1)
@@ -71,7 +71,7 @@ DiffusionLayer::DiffusionLayer(unsigned int width,
 	std::string textureOneName = textureManager->generateTextureName(DIFFUSION_TEXTURE_PREFIX);
 	
 	// Create texture
-	textureManager->createTexture(textureOneName, this->width, this->height, std::vector<float>(this->width * this->height * 4, 0.0f));
+	textureManager->createTexture(textureOneName, this->width, this->height, std::vector<float>(this->width * this->height * 4, 10.0f));
 	
 	// Bind texture to an image unit
 	textureManager->bindImageUnit(textureOneName);
@@ -84,7 +84,7 @@ DiffusionLayer::DiffusionLayer(unsigned int width,
 	std::string textureTwoName = textureManager->generateTextureName(DIFFUSION_TEXTURE_PREFIX);
 	
 	// Create texture
-	textureManager->createTexture(textureTwoName, this->width, this->height, std::vector<float>(this->width * this->height * 4, 0.0f));
+	textureManager->createTexture(textureTwoName, this->width, this->height, std::vector<float>(this->width * this->height * 4, 10.0f));
 	
 	// Bind texture to an image unit
 	textureManager->bindImageUnit(textureTwoName);

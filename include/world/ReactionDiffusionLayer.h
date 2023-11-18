@@ -3,15 +3,14 @@
 #include <string>
 #include <memory>
 #include "Layer.h"
-#include "world/DiffusionLayer.h"
 #include "engine/TextureManager.h"
 #include "engine/ShaderManager.h"
 #include "engine/QuadRenderer.h"
 
 // TODO: This doesn't work for multiple diffusion layers
-const std::string DIFFUSION_TEXTURE_PREFIX = "DIFFUSION";
+const std::string REACTION_DIFFUSION_TEXTURE_PREFIX = "REACTION_DIFFUSION";
 
-class DiffusionLayer : public Layer{
+class ReactionDiffusionLayer : public Layer{
     public: 
         /**
          * @brief Construct a new Diffusion Layer object.
@@ -19,7 +18,7 @@ class DiffusionLayer : public Layer{
          * 
          * @param diffusionRate 
          */
-        DiffusionLayer(unsigned int width,
+        ReactionDiffusionLayer(unsigned int width,
                        unsigned int height,
                        float diffusionRate,
                        std::shared_ptr<ShaderManager> shaderManager,
@@ -31,7 +30,7 @@ class DiffusionLayer : public Layer{
          * @brief Destroy the Diffusion Layer object
          * 
          */
-        ~DiffusionLayer();
+        ~ReactionDiffusionLayer();
 
         // /**
         //  * @brief Add a temporary source (or sink) to the diffusion layer. Lasts for one update only.
@@ -42,15 +41,6 @@ class DiffusionLayer : public Layer{
         //  */
         // void addTemporarySource(unsigned int gridX, unsigned int gridY, float sourceValue);
 
-
-        /**
-         * @brief Add a permanent source (or sink) to the diffusion layer. Lasts until removed.
-         * 
-         * @param gridX x coordinate of the source/sink
-         * @param gridY y coordinate of the source/sink
-         * @param sourceValue The value of the source/sink
-         */
-        void addPermanentSource(unsigned int gridX, unsigned int gridY, float sourceValue);
 
         std::string getOutputTexture();
 
@@ -80,5 +70,4 @@ class DiffusionLayer : public Layer{
         
         std::string inputTexture;
         std::string outputTexture;
-        std::string sourcesTexture;
 };

@@ -1,0 +1,77 @@
+- **Cell-specific Genome Neural Cellular Automata**
+    - **Bit Packing**
+        - **Assume rgba32ui (can go smaller)**
+        - **Bits 0-a (Booleans/1 bit) (maybe for program use / optimization)**
+            - **Self (Properties):**
+                - isAlive
+                - markedForBirth
+                - markedForDeath
+                - hasNeighbor(Up/Down/Left/Right)
+                - isReproducing
+                - isMobile
+                - isHungry
+                - isCommunicating
+            - **Self (Actions):**  
+                -  
+            - **Neighbors (\* 8):**
+                - isAlive
+                - hasNeighbor(Up/Down/Left/Right)
+                - isMutating
+                - isInReproductionProcess
+                - isUnderAttack
+                - isMobile
+                - isHungry
+                - isCommunicating
+    - **Bits a-b (Integers/2-8 bits)**
+        - **Self:**
+            - energy (0 to 255)
+            - timeAlive
+            - reproductionCount
+            - mutationRate
+            - attackPower
+            - defensePower
+            - reproductionSpeed
+            - mobilitySpeed*
+        - **Neighbors:**
+            - energy
+            - timeAlive
+            - reproductionCount
+            - mutationRate
+            - attackPower
+            - defensePower
+            - communicationSkill
+            - mobilitySpeed
+    - **Arbitrary Memory?**
+        - **Self memory:** (stores historical actions, status, etc.)
+        - **Incoming memory:** (communication from other cells)
+        - **Outgoing memory:** (communication to other cells)
+
+    **Possible Actions:**
+    - Move up, left, right, down
+    - Attack up, left, right, down
+    - Reproduce up, left, right, down (with mutations)
+    - Communicate up, left, right, down
+    - Consume energy
+    - Place pheremone
+    - Die
+
+    **Need Some Update Rule Scheme**
+    - **New layer, rgba32f (2x 16f = 8 FP16 total)**
+        - Each of the 8 FP16 is a weight
+    - **Mini Neural Network:**
+        - **Input layer:** (cell status, neighbors' status, etc.)
+        - **2 Hidden layers:** (with activation functions)
+        - **Output layer:** (action, softmax)
+    
+    **Update Pipeline:**
+    - Set states 
+      - energy
+      - timeAlive
+      - ...
+    - (Sync)
+    - PlanMove
+    - (Sync)
+    - Perform NN forward pass
+    - Execute action (move, attack, reproduce, etc.)
+    - Update environment (energy consumption, cell deaths, etc.)
+

@@ -7,8 +7,8 @@ layout(rgba32f, binding = 0) uniform image2D imgInput;
 layout(rgba32f, binding = 1) uniform image2D imgOutput;
 layout(rgba32f, binding = 2) uniform image2D imgEnergy;
 layout (location = 1) uniform ivec2 textureSize; // textureSize.x is width, textureSize.y is height
-layout (location = 2) uniform float energyFlux; 
-
+layout (location = 2) uniform float birthEnergyFlux; 
+layout (location = 3) uniform float deathEnergyFlux; 
 // width,height+2 for borders
 shared float cellState[10][10];
 
@@ -73,43 +73,43 @@ void main() {
   //   nextCellState = 1.0;
   // }
 
-  imageStore(imgOutput, texelCoord, vec4(nextState));
+  // imageStore(imgOutput, texelCoord, vec4(nextState));
 
-  // Birth
-  if(nextState > currentCellState){
-    imageStore(imgEnergy, texelCoord, vec4(imageLoad(imgEnergy, texelCoord).r - energyFlux, 0.0, 0.0, 1.0)); 
-  }
-
-  // Death
-  if(nextState < currentCellState){
-    imageStore(imgEnergy, texelCoord, vec4(imageLoad(imgEnergy, texelCoord).r + energyFlux, 0.0, 0.0, 1.0)); 
-  }
-
-  // // If cell is currently alive and should die
-  // if(cellState[localX][localY] > 0.5 && nextCellState < 0.5){
-  //   // Add energy
-  //   imageStore(imgEnergy, texelCoord, vec4(imageLoad(imgEnergy, texelCoord).r + energyFlux/2, 0.0, 0.0, 1.0)); 
-  //   // Write next state
-  //   imageStore(imgOutput, texelCoord, vec4(0.0));
+  // // Birth
+  // if(nextState > currentCellState){
+  //   imageStore(imgEnergy, texelCoord, vec4(imageLoad(imgEnergy, texelCoord).r - energyFlux, 0.0, 0.0, 1.0)); 
   // }
 
-  // // If cell is currently dead and should be born, required at least energyFlux units of energy
-  // else if(cellState[localX][localY] < 0.5 && nextCellState > 0.5){
-  //   // Check if there is enough energy
-    
-  //   if(localEnergy >= energyFlux){
-  //     // Remove energy
-  //     imageStore(imgEnergy, texelCoord, vec4(imageLoad(imgEnergy, texelCoord).r - energyFlux, 0.0, 0.0, 1.0)); 
-    
-  //     // Write next state
-  //     imageStore(imgOutput, texelCoord, vec4(1.0));
-  //   } 
-    
-  // }else{
-  //   imageStore(imgOutput, texelCoord, vec4(nextCellState));
+  // // Death
+  // if(nextState < currentCellState){
+  //   imageStore(imgEnergy, texelCoord, vec4(imageLoad(imgEnergy, texelCoord).r + energyFlux, 0.0, 0.0, 1.0)); 
   // }
+
+  // If cell should die
+  if(currentCellState > 0.5 && nextState < 0.5){
+    // Add energy
+    imageStore(imgEnergy, texelCoord, vec4(imageLoad(imgEnergy, texelCoord).r + deathEnergyFlux, 0.0, 0.0, 1.0)); 
+    // Write next state
+    imageStore(imgOutput, texelCoord, vec4(nextState));
+  }
+
+  // If cell is currently dead and should be born, required at least energyFlux units of energy
+  else if(currentCellState < 0.5 && nextState > 0.5){
+    // Check if there is enough energy
+    
+    if(localEnergy >= birthEnergyFlux){
+      // Remove energy
+      imageStore(imgEnergy, texelCoord, vec4(imageLoad(imgEnergy, texelCoord).r - birthEnergyFlux, 0.0, 0.0, 1.0)); 
+    
+      // Write next state
+      imageStore(imgOutput, texelCoord, vec4(nextState));
+    } 
+    
+  }else{
+    // If cell is dead and should stay dead or cell is alive and should stay alive, do nothing
+    imageStore(imgOutput, texelCoord, vec4(nextState));
+  }
   
-  // If cell is dead and should stay dead or cell is alive and should stay alive, do nothing
 
 }
 

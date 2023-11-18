@@ -57,4 +57,56 @@ For Moore, this parameter is omitted.
 My case:
 Automata Layer:
 - Considers 3x3 grid neighbors, optionally the middle cell
-- 
+- ??
+
+New ideas:
+- Neural CA
+- Cell-specific genome neural celluar automata
+    - Bit packing
+    - Assume rgba32ui (can go smaller)
+    - Bits 0-a (bools/1 bit) (maybe for program use / optimization)
+        - Self:
+            - isAlive
+            - hasNeighbor(Up/Down/Left/Right)
+            - ...
+        - Neighbors (* 8):
+            - Everything from self
+    - Bits a-b (Integers/2-8 bits)
+        - Self:
+            - energy
+            - timeAlive
+            - ...
+        -  Neighbors
+            - ....
+    - ...
+    - Aribtrary Memory?
+        - Self memory
+        - Incoming memory
+        - Outgoing memory
+
+    Has possible actions
+    - Move up, left, right, down
+    - Attack up, left, right, down
+    - Reproduce up, left, ... (reproduce with mutations)
+    (What if another cell is blocking?) = ignore except attack
+        
+
+    Need some update rule scheme
+    - New layer, rgba32f (2x 16f = 8 FP16 total)
+    - Each of the 8 FP16 is a weight
+    - I can make a mini NN
+    - Input layer = ...
+    - 2 Hidden layers
+    - Output layer = action (softmax)
+
+    Update pipeline:
+    - Set states (isAlive etc.)
+    - Perform NN forward pass
+    - Do action
+
+
+
+
+====
+http://www.bradgoodman.com/bittool/
+In the fully formed GUI program, I want to be able to make different creature structures and shaders at runtime.  

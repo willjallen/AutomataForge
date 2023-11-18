@@ -41,7 +41,8 @@ AutomataLayer::AutomataLayer(unsigned int width,
 	shaderManager->setUniform("diffusion_coupled_game_of_life", "textureSize", glm::ivec2(this->width, this->height));	
 
 	// Diffusion layer coupling
-	shaderManager->setUniform("diffusion_coupled_game_of_life", "energyFlux", 20.0f);	
+	shaderManager->setUniform("diffusion_coupled_game_of_life", "birthEnergyFlux", 0.02f);	
+	shaderManager->setUniform("diffusion_coupled_game_of_life", "deathEnergyFlux", 0.01f);	
 
 	// Set up texture
 	// Create a buffer for the initial state
